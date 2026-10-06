@@ -1,0 +1,497 @@
+{
+  "targets": [
+    "cad",
+    "lad",
+    "lcx",
+    "rca",
+    "cath"
+  ],
+  "features": {
+    "age": {
+      "original": "age",
+      "label": "Age",
+      "unit": "years",
+      "normal": "30-86 in cohort",
+      "group": "demographic",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "weight": {
+      "original": "weight",
+      "label": "Weight",
+      "unit": "kg",
+      "normal": "48-120 in cohort",
+      "group": "demographic",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "length": {
+      "original": "length",
+      "label": "Height",
+      "unit": "cm",
+      "normal": "140-188 in cohort",
+      "group": "demographic",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "sex": {
+      "original": "sex",
+      "label": "Sex",
+      "unit": null,
+      "normal": "Male / Female",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "bmi": {
+      "original": "bmi",
+      "label": "BMI",
+      "unit": "kg/m2",
+      "normal": "18.5-24.9",
+      "group": "demographic",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "dm": {
+      "original": "dm",
+      "label": "Diabetes mellitus",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "htn": {
+      "original": "htn",
+      "label": "Hypertension",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "current_smoker": {
+      "original": "current_smoker",
+      "label": "Current smoker",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "ex_smoker": {
+      "original": "ex_smoker",
+      "label": "Ex-smoker",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "fh": {
+      "original": "fh",
+      "label": "Family history of CAD",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "obesity": {
+      "original": "obesity",
+      "label": "Obesity",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "crf": {
+      "original": "crf",
+      "label": "Chronic renal failure",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "cva": {
+      "original": "cva",
+      "label": "Cerebrovascular accident",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "airway_disease": {
+      "original": "airway_disease",
+      "label": "Airway disease",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "thyroid_disease": {
+      "original": "thyroid_disease",
+      "label": "Thyroid disease",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "chf": {
+      "original": "chf",
+      "label": "Congestive heart failure",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "dlp": {
+      "original": "dlp",
+      "label": "Dyslipidemia",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "demographic",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "bp": {
+      "original": "bp",
+      "label": "Blood pressure (systolic)",
+      "unit": "mmHg",
+      "normal": "< 120",
+      "group": "symptom_exam",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "pr": {
+      "original": "pr",
+      "label": "Pulse rate",
+      "unit": "bpm",
+      "normal": "60-100",
+      "group": "symptom_exam",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "edema": {
+      "original": "edema",
+      "label": "Edema",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "weak_peripheral_pulse": {
+      "original": "weak_peripheral_pulse",
+      "label": "Weak peripheral pulse",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "lung_rales": {
+      "original": "lung_rales",
+      "label": "Lung rales",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "systolic_murmur": {
+      "original": "systolic_murmur",
+      "label": "Systolic murmur",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "diastolic_murmur": {
+      "original": "diastolic_murmur",
+      "label": "Diastolic murmur",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "typical_chest_pain": {
+      "original": "typical_chest_pain",
+      "label": "Typical chest pain",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "dyspnea": {
+      "original": "dyspnea",
+      "label": "Dyspnea",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "function_class": {
+      "original": "function_class",
+      "label": "Function class",
+      "unit": null,
+      "normal": "0-3",
+      "group": "symptom_exam",
+      "kind": "numeric",
+      "dtype": "int64"
+    },
+    "atypical": {
+      "original": "atypical",
+      "label": "Atypical chest pain",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "nonanginal": {
+      "original": "nonanginal",
+      "label": "Nonanginal pain",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "lowth_ang": {
+      "original": "lowth_ang",
+      "label": "Low-threshold angina",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "symptom_exam",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "q_wave": {
+      "original": "q_wave",
+      "label": "Q wave",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "ecg",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "st_elevation": {
+      "original": "st_elevation",
+      "label": "ST elevation",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "ecg",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "st_depression": {
+      "original": "st_depression",
+      "label": "ST depression",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "ecg",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "tinversion": {
+      "original": "tinversion",
+      "label": "T inversion",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "ecg",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "lvh": {
+      "original": "lvh",
+      "label": "Left ventricular hypertrophy",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "ecg",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "poor_r_progression": {
+      "original": "poor_r_progression",
+      "label": "Poor R-wave progression",
+      "unit": null,
+      "normal": "No / Yes",
+      "group": "ecg",
+      "kind": "binary",
+      "dtype": "int64"
+    },
+    "bbb": {
+      "original": "bbb",
+      "label": "Bundle branch block",
+      "unit": null,
+      "normal": "None / LBBB / RBBB",
+      "group": "ecg",
+      "kind": "categorical",
+      "dtype": "string"
+    },
+    "fbs": {
+      "original": "fbs",
+      "label": "Fasting blood sugar",
+      "unit": "mg/dL",
+      "normal": "70-100",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "cr": {
+      "original": "cr",
+      "label": "Creatinine",
+      "unit": "mg/dL",
+      "normal": "0.6-1.2",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "tg": {
+      "original": "tg",
+      "label": "Triglycerides",
+      "unit": "mg/dL",
+      "normal": "< 150",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "ldl": {
+      "original": "ldl",
+      "label": "LDL cholesterol",
+      "unit": "mg/dL",
+      "normal": "< 100",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "hdl": {
+      "original": "hdl",
+      "label": "HDL cholesterol",
+      "unit": "mg/dL",
+      "normal": ">= 40",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "bun": {
+      "original": "bun",
+      "label": "Blood urea nitrogen",
+      "unit": "mg/dL",
+      "normal": "7-20",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "esr": {
+      "original": "esr",
+      "label": "ESR",
+      "unit": "mm/hr",
+      "normal": "0-20",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "hb": {
+      "original": "hb",
+      "label": "Hemoglobin",
+      "unit": "g/dL",
+      "normal": "12-18",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "k": {
+      "original": "k",
+      "label": "Potassium",
+      "unit": "mEq/L",
+      "normal": "3.5-5.0",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "na": {
+      "original": "na",
+      "label": "Sodium",
+      "unit": "mEq/L",
+      "normal": "135-145",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "wbc": {
+      "original": "wbc",
+      "label": "WBC",
+      "unit": "cells/mcL",
+      "normal": "4500-11000",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "lymph": {
+      "original": "lymph",
+      "label": "Lymphocytes",
+      "unit": "%",
+      "normal": "20-40",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "neut": {
+      "original": "neut",
+      "label": "Neutrophils",
+      "unit": "%",
+      "normal": "40-70",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "plt": {
+      "original": "plt",
+      "label": "Platelets",
+      "unit": "x1000/mcL",
+      "normal": "150-400",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "ef_tte": {
+      "original": "ef_tte",
+      "label": "Ejection fraction (TTE)",
+      "unit": "%",
+      "normal": ">= 55",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "float64"
+    },
+    "region_rwma": {
+      "original": "region_rwma",
+      "label": "RWMA regions",
+      "unit": "count",
+      "normal": "0",
+      "group": "lab_echo",
+      "kind": "numeric",
+      "dtype": "int64"
+    },
+    "vhd": {
+      "original": "vhd",
+      "label": "Valvular heart disease",
+      "unit": null,
+      "normal": "None / mild / Moderate / Severe",
+      "group": "lab_echo",
+      "kind": "ordinal",
+      "dtype": "int64"
+    }
+  }
+}
