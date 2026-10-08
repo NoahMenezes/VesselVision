@@ -1,25 +1,23 @@
 # 3D heart model
 
-## Wanted file
+## Current file
 
-`heart.glb` in this directory (Git-ignored if over 5 MB? No: it IS committed,
-it must stay under ~5 MB).
+`heart.glb` (14 KB, single mesh `Heart_Full`) — "Heart" by **Quaternius**,
+via poly.pizza (`/m/1yCRUwFnwX`), **CC0 public domain** (no attribution
+required; credited here anyway). Stylized low-poly myocardium shell; the
+LAD/LCX/RCA arteries are separate tube meshes (see `src/lib/arteries.ts`).
 
-## Source (do this in a browser; direct server download is blocked)
+## Wanted upgrade (optional, drop-in)
 
-1. Open <https://3d.nih.gov/entries/3DPX-021000> ("Heart, Male", NIH 3D).
-2. Press Download, choose the **VH_M_Heart.glb** input mesh.
-3. Save it here as `heart.glb`.
+A realistic anatomical mesh makes the viz stronger and swaps in with zero
+code changes (same path, same scale handling). In a browser:
 
-Alternatives (same terms): "17 yo Female, Normal Heart"
-<https://3d.nih.gov/entries/3DPX-002636> (Matthew Bramlet).
-
-## License and credit
-
-NIH 3D models are U.S. public domain. Cite in docs and README:
-
-- VH_M_Heart, NIH 3D (3DPX-021000), public domain.
-  <https://3d.nih.gov/entries/3DPX-021000>
+1. NIH 3D "Heart, Male" (public domain): open
+   <https://3d.nih.gov/entries/3DPX-021000>, Download, choose the
+   **VH_M_Heart.glb** input mesh, save here as `heart.glb`. (Direct server
+   download is blocked by signed URLs; interactive browser download works.)
+2. Or Sketchfab "Anatomically Correct Human Heart" (free account, check the
+   author's CC license, usually CC-BY) and credit author + URL + license here.
 
 ## Why a separate mesh per artery still exists
 
