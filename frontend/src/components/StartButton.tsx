@@ -20,7 +20,7 @@ export function StartButton() {
   }
   if (!isSignedIn) {
     return (
-      <SignInButton mode="modal">
+      <SignInButton mode="modal" forceRedirectUrl="/console">
         <Button>Sign in to start</Button>
       </SignInButton>
     );

@@ -1,4 +1,5 @@
 import { Disclaimer } from "@/components/Disclaimer";
+import { AutoConsole } from "@/components/AutoConsole";
 import { HeroHeart } from "@/components/HeroHeart";
 import { LandingNav } from "@/components/LandingNav";
 import { StartButton } from "@/components/StartButton";
@@ -19,6 +20,7 @@ const STATS: [string, string][] = [
 export default function Landing() {
   return (
     <div className="flex min-h-dvh flex-col">
+      <AutoConsole />
       <LandingNav />
       <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 lg:px-6">
         <section aria-label="Introduction" className="grid items-center gap-8 py-10 lg:grid-cols-2 lg:py-16">

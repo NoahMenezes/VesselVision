@@ -34,7 +34,7 @@ export function LandingNav() {
             <UserButton />
           </>
         ) : (
-          <SignInButton mode="modal">
+          <SignInButton mode="modal" forceRedirectUrl="/console">
             <Button variant="ghost">Sign in</Button>
           </SignInButton>
         )}
