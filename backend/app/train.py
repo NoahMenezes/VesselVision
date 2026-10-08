@@ -54,15 +54,23 @@ warnings.filterwarnings(
 
 METRICS = ["accuracy", "precision", "recall", "f1", "roc_auc"]
 
+# Parallelism cap: nested pools (search workers x estimator threads) thrashed a
+# 12-core box to load 140+. N_JOBS bounds the OUTER level; estimators inherit it
+# so total threads stay near core count. Default 4 (conservative next to other
+# workloads); override per machine, e.g. N_JOBS=8.
+N_JOBS = int(os.getenv("N_JOBS", "4"))
+
 
 def _candidates(y: pd.Series, seed: int) -> list[tuple[str, object, dict]]:
     pos = int(y.sum())
     neg = len(y) - pos
     spw = neg / max(pos, 1)
     logreg = LogisticRegression(max_iter=2000, class_weight="balanced", random_state=seed)
-    rf = RandomForestClassifier(class_weight="balanced", random_state=seed, n_jobs=-1)
-    xgb = XGBClassifier(scale_pos_weight=spw, random_state=seed, n_jobs=-1, eval_metric="logloss")
-    lgbm = LGBMClassifier(scale_pos_weight=spw, random_state=seed, n_jobs=-1, verbose=-1)
+    rf = RandomForestClassifier(class_weight="balanced", random_state=seed, n_jobs=N_JOBS)
+    xgb = XGBClassifier(
+        scale_pos_weight=spw, random_state=seed, n_jobs=N_JOBS, eval_metric="logloss"
+    )
+    lgbm = LGBMClassifier(scale_pos_weight=spw, random_state=seed, n_jobs=N_JOBS, verbose=-1)
     smote = SMOTE(random_state=seed)
     return [
         ("logreg", logreg, {"clf__C": np.logspace(-2, 1, 20)}),
@@ -133,7 +141,7 @@ def run_target(
             n_iter=min(n_iter, _grid_size(dist)),
             scoring="roc_auc",
             cv=cv,
-            n_jobs=-1,
+            n_jobs=N_JOBS,
             random_state=seed,
             refit=True,
         )
@@ -143,7 +151,7 @@ def run_target(
         from sklearn.model_selection import cross_validate
 
         best_pipe = clone(search.best_estimator_)
-        scores = cross_validate(best_pipe, X, y, cv=cv, scoring=METRICS, n_jobs=-1)
+        scores = cross_validate(best_pipe, X, y, cv=cv, scoring=METRICS, n_jobs=N_JOBS)
         row = {"target": target, "model": name, "best_params": str(search.best_params_)}
         for m in METRICS:
             vals = scores[f"test_{m}"]
