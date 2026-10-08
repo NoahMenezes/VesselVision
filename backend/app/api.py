@@ -76,11 +76,18 @@ def create_explanation(body: ExplainRequest) -> dict[str, Any]:
         ensure_trained()
     except ModelNotTrainedError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    # SHAP explainers land in Phase 6; models alone are not enough.
-    raise HTTPException(
-        status_code=503,
-        detail="Explainability is pending (Phase 6 explainers not built yet).",
-    )
+    from app.explain import explain
+
+    try:
+        result = explain(body.inputs, body.target)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=[str(exc)]) from exc
+    return {
+        "target": result["target"],
+        "probability": result["probability"],
+        "base_value": result["base_value"],
+        "contributions": result["contributions"],
+    }
 
 
 @router.post("/predict-batch", response_model=list[BatchRowResult])
