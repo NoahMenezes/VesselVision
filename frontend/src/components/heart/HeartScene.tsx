@@ -3,56 +3,14 @@
  *  on first interaction, click-empty-space deselects. Light by design: no
  *  post-processing, pixel ratio capped, memoized geometries.
  */
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import type { ElementRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { useStore } from "@/store/VesselVisionContext";
 import { CoronaryTree } from "./CoronaryTree";
-import { HEART_MODEL_URL, Myocardium } from "./Myocardium";
+import { Myocardium } from "./Myocardium";
 import { VesselLegend } from "./VesselLegend";
-
-function Loader() {
-  return (
-    <Html center>
-      <div className="rounded-lg border border-border bg-surface px-3 py-2 text-xs">
-        Loading heart model…
-      </div>
-    </Html>
-  );
-}
-
-/** HEAD-checks the GLB once; renders myocardium only when present, guidance
- *  otherwise. No suspense-error path, so no unmount race when the file is
- *  absent (the user downloads it per public/models/CREDITS.md). */
-function HeartModelGate() {
-  const [state, setState] = useState<"pending" | "ready" | "missing">("pending");
-  useEffect(() => {
-    let live = true;
-    fetch(HEART_MODEL_URL, { method: "HEAD" })
-      .then((res) => {
-        if (live) setState(res.ok ? "ready" : "missing");
-      })
-      .catch(() => {
-        if (live) setState("missing");
-      });
-    return () => {
-      live = false;
-    };
-  }, []);
-  if (state === "pending") return <Loader />;
-  if (state === "missing") {
-    return (
-      <Html center>
-        <div className="max-w-60 rounded-lg border border-risk-moderate/40 bg-surface p-3 text-xs">
-          Heart model file is missing. Add <code>heart.glb</code> per{" "}
-          <code>public/models/CREDITS.md</code>. Arteries below still render.
-        </div>
-      </Html>
-    );
-  }
-  return <Myocardium />;
-}
 
 const CAMERA_PRESETS: Record<"front" | "back", { pos: [number, number, number]; label: string }> = {
   front: { pos: [0, 0.2, 3.4], label: "Front view" },
@@ -109,10 +67,13 @@ export function HeartScene() {
           <ambientLight intensity={0.7} />
           <directionalLight position={[3, 4, 5]} intensity={1.2} />
           <directionalLight position={[-3, 1, -2]} intensity={0.35} />
-          <Suspense fallback={<Loader />}>
-            <HeartModelGate />
-            <CoronaryTree />
+          {/* Suspense with a null fallback: the GLB streams in without
+              mounting/unmounting any portal. HeartCanvas shows the DOM
+              loader until Canvas mounts; arteries render immediately. */}
+          <Suspense fallback={null}>
+            <Myocardium />
           </Suspense>
+          <CoronaryTree />
           <OrbitControls
             ref={controls}
             makeDefault

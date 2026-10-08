@@ -10,6 +10,7 @@ import { ShapPanel } from "./dashboard/ShapPanel";
 import { SummaryCard } from "./dashboard/SummaryCard";
 import { VesselCards } from "./dashboard/VesselCards";
 import { HeartCanvas } from "./heart/HeartCanvas";
+import { CanvasErrorBoundary } from "./heart/ErrorBoundary";
 import { Schematic2D } from "./heart/VesselLegend";
 import { useStore } from "@/store/VesselVisionContext";
 
@@ -33,7 +34,9 @@ export function HeartPanel() {
         Rotate and zoom. Arteries recolor green to red by predicted
         stenosis probability; click a vessel to inspect it.
       </p>
-      <HeartCanvas />
+      <CanvasErrorBoundary>
+        <HeartCanvas />
+      </CanvasErrorBoundary>
       <Schematic2D />
     </Card>
   );

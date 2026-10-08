@@ -9,8 +9,7 @@
 import { useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-
-export const HEART_MODEL_URL = "/models/heart.glb";
+import { HEART_MODEL_URL } from "@/lib/arteries";
 
 export function Myocardium() {
   const gltf = useGLTF(HEART_MODEL_URL);

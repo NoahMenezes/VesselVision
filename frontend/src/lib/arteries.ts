@@ -8,6 +8,10 @@
  */
 import type { VesselKey } from "@/lib/types";
 
+/** Myocardium mesh URL. Kept here (not in Myocardium.tsx) so non-3D modules
+ *  can reference it without importing three.js (bun test cannot require it). */
+export const HEART_MODEL_URL = "/models/heart.glb";
+
 export const ANATOMY_MAP: Record<VesselKey, string> = {
   LAD: "Left anterior descending",
   LCX: "Left circumflex",
