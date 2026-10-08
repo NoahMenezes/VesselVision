@@ -60,6 +60,10 @@ make train     # full retrain -> artifacts + metrics + figures (Phase 4-5)
 make test      # backend pytest + frontend typecheck/lint
 ```
 
+One-command alternative (from `frontend/`): `bun run dev` boots the API
+(:8000) and the web app together; `bun run dev:web` / `bun run dev:api` run
+one side only.
+
 Full training (~1h, run detached): `cd backend && N_JOBS=4 nohup uv run
 python -m app.train > /tmp/train_full.log 2>&1 &`. Done = 25 lines in
 `backend/artifacts/cv_results.csv`. `N_JOBS` caps worker processes (default
@@ -69,7 +73,11 @@ Or see `Makefile` for the exact one-liners. Health: `GET http://localhost:8000/h
 
 ## Deployment
 
-- Frontend: Vercel, with `NEXT_PUBLIC_API_URL` set to the backend origin.
+- Frontend: Vercel, with **Root Directory = `frontend`**. Set env vars in the
+  Vercel dashboard (never in files): `NEXT_PUBLIC_API_URL` (backend origin),
+  `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` (production Clerk
+  keys, not test keys). `frontend/vercel.json` pins install/build commands;
+  `next build` passes with zero env vars (auth UI degrades to setup guidance).
 - Backend: Render / Hugging Face Spaces via `backend/Dockerfile`
   (`docker build -f backend/Dockerfile -t vesselvision-backend ./backend`), mounting
   `data/` and `backend/artifacts/` and setting `FRONTEND_URL` to the deployed
