@@ -36,12 +36,13 @@ export function Badge({ tone, children }: { tone: "low" | "moderate" | "high" | 
 }
 
 export function Button({
-  variant = "primary", className, ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost" }) {
+  variant = "primary", size = "md", className, ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost"; size?: "md" | "sm" }) {
   return (
     <button
       className={clsx(
-        "rounded px-4 py-2 text-sm font-semibold transition-all duration-200 disabled:opacity-50 active:scale-[0.98]",
+        "font-semibold transition-all duration-200 disabled:opacity-50 active:scale-[0.98]",
+        size === "md" ? "rounded px-4 py-2 text-sm" : "rounded px-2.5 py-1 text-xs",
         variant === "primary"
           ? "bg-foreground text-white hover:opacity-90"
           : "border border-border bg-surface text-foreground hover:bg-surface-soft",

@@ -7,7 +7,7 @@ import { useRef, useState } from "react";
 import Papa from "papaparse";
 import { getSchema } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
-import { Button, Card } from "./ui";
+import { Button } from "./ui";
 
 interface Parsed {
   headers: string[];
@@ -79,10 +79,14 @@ export function CsvUpload() {
   };
 
   return (
-    <Card>
+    <details className="rounded-lg border border-border bg-surface">
+      <summary className="cursor-pointer list-none px-4 py-2.5 text-sm font-medium">
+        CSV upload <span className="font-normal text-muted">— batch rows, optional</span>
+      </summary>
+      <div className="px-4 pb-4">
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="font-medium">CSV upload</h2>
-        <Button variant="ghost" onClick={() => void downloadTemplate()}>Template</Button>
+        <p className="text-xs text-muted">Drop a file, pick a row to load it.</p>
+        <Button size="sm" variant="ghost" onClick={() => void downloadTemplate()}>Template</Button>
       </div>
       <div
         role="button"
@@ -142,6 +146,7 @@ export function CsvUpload() {
           )}
         </div>
       )}
-    </Card>
+      </div>
+    </details>
   );
 }

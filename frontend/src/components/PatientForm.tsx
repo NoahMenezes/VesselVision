@@ -57,20 +57,18 @@ function FieldRow({ name, field, value, onChange }: {
       {field.unit ? <span className="text-foreground/50"> ({field.unit})</span> : null}
     </span>
   );
-  const hint = field.normal ? (
-    <span className="block text-[11px] text-foreground/50">Typical: {field.normal}</span>
-  ) : null;
   const tip = GLOSSARY[name];
   const head = tip ? <Tooltip tip={tip}>{label}</Tooltip> : label;
 
   if (name === "sex") {
     return (
-      <label className="block">
+      <div className="flex items-center justify-between gap-2">
         {head}
-        <span className="mt-1 flex gap-1">
+        <span className="flex shrink-0 gap-1">
           {(["Female", "Male"] as const).map((opt) => (
             <Button
               key={opt}
+              size="sm"
               type="button"
               variant={value === opt ? "primary" : "ghost"}
               onClick={() => onChange(opt)}
@@ -80,19 +78,19 @@ function FieldRow({ name, field, value, onChange }: {
             </Button>
           ))}
         </span>
-        {hint}
-      </label>
+      </div>
     );
   }
   if (field.kind === "binary") {
     const cur = value === 1 || value === "Y" ? 1 : value === 0 || value === "N" ? 0 : undefined;
     return (
-      <label className="block">
+      <div className="flex items-center justify-between gap-2">
         {head}
-        <span className="mt-1 flex gap-1">
+        <span className="flex shrink-0 gap-1">
           {([["No", 0], ["Yes", 1]] as const).map(([txt, v]) => (
             <Button
               key={txt}
+              size="sm"
               type="button"
               variant={cur === v ? "primary" : "ghost"}
               onClick={() => onChange(v)}
@@ -102,8 +100,7 @@ function FieldRow({ name, field, value, onChange }: {
             </Button>
           ))}
         </span>
-        {hint}
-      </label>
+      </div>
     );
   }
   if (name === "bbb") {
@@ -111,14 +108,13 @@ function FieldRow({ name, field, value, onChange }: {
       <label className="block">
         {head}
         <select
-          className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
+          className="mt-0.5 w-full rounded border border-border bg-surface px-2 py-1.5 text-sm"
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(e.target.value)}
         >
           <option value="">Select...</option>
           {BBB_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
-        {hint}
       </label>
     );
   }
@@ -127,14 +123,13 @@ function FieldRow({ name, field, value, onChange }: {
       <label className="block">
         {head}
         <select
-          className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
+          className="mt-0.5 w-full rounded border border-border bg-surface px-2 py-1.5 text-sm"
           value={value === undefined || value === "" ? "" : String(value)}
           onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
         >
           <option value="">Select...</option>
           {VHD_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        {hint}
       </label>
     );
   }
@@ -143,12 +138,11 @@ function FieldRow({ name, field, value, onChange }: {
       {head}
       <input
         type="number"
-        className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
+        className="mt-0.5 w-full rounded border border-border bg-surface px-2 py-1.5 text-sm"
         value={value ?? ""}
         placeholder={field.normal ?? ""}
         onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
       />
-      {hint}
     </label>
   );
 }
@@ -204,14 +198,14 @@ export function PatientForm() {
           placeholder="e.g. cholesterol, smoking, ECG…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
+          className="mt-0.5 w-full rounded border border-border bg-surface px-2 py-1.5 text-sm"
         />
       </label>
 
       <label className="mb-2 block text-xs">
         Load example patient
         <select
-          className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
+          className="mt-0.5 w-full rounded border border-border bg-surface px-2 py-1.5 text-sm"
           defaultValue=""
           onChange={(e) => {
             const s = samples.find((x) => x.id === e.target.value);
@@ -246,7 +240,7 @@ export function PatientForm() {
                 {fields.filter((f) => inputs[f] !== undefined).length}/{fields.length}
               </span>
             </summary>
-            <div className="space-y-3 px-3 pb-3">
+            <div className="grid gap-x-3 gap-y-1.5 px-3 pb-3 sm:grid-cols-2">
               {fields.map((n) => (
                 <FieldRow key={n} name={n} field={schema.features[n]} value={inputs[n]} onChange={(v) => set(n, v)} />
               ))}
