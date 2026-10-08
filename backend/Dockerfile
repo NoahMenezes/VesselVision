@@ -4,6 +4,8 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 WORKDIR /srv
 COPY pyproject.toml uv.lock ./
+# Slow networks hit uv's 30s default on big wheels (scipy, nvidia-nccl).
+ENV UV_HTTP_TIMEOUT=600
 RUN uv sync --frozen --no-dev
 COPY app ./app
 COPY main.py ./
