@@ -35,5 +35,7 @@ export function Myocardium() {
     });
     return clone;
   }, [gltf, material]);
-  return <primitive object={scene} scale={1.4} />;
+  return <primitive object={scene} scale={240} />;
+  // Raw GLB spans ~0.01 units; 240x lands it on the artery paths (~1.4 units).
+  // Recheck this constant whenever heart.glb is swapped (see CREDITS.md).
 }
