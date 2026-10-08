@@ -111,7 +111,7 @@ function FieldRow({ name, field, value, onChange }: {
       <label className="block">
         {head}
         <select
-          className="mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm"
+          className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(e.target.value)}
         >
@@ -127,7 +127,7 @@ function FieldRow({ name, field, value, onChange }: {
       <label className="block">
         {head}
         <select
-          className="mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm"
+          className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
           value={value === undefined || value === "" ? "" : String(value)}
           onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
         >
@@ -143,7 +143,7 @@ function FieldRow({ name, field, value, onChange }: {
       {head}
       <input
         type="number"
-        className="mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm"
+        className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
         value={value ?? ""}
         placeholder={field.normal ?? ""}
         onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
@@ -204,14 +204,14 @@ export function PatientForm() {
           placeholder="e.g. cholesterol, smoking, ECG…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm"
+          className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
         />
       </label>
 
       <label className="mb-2 block text-xs">
         Load example patient
         <select
-          className="mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm"
+          className="mt-1 w-full rounded border border-border bg-surface px-3 py-2 text-sm"
           defaultValue=""
           onChange={(e) => {
             const s = samples.find((x) => x.id === e.target.value);
@@ -238,7 +238,7 @@ export function PatientForm() {
             key={group}
             open={isOpen}
             onToggle={(e) => setOpen((o) => ({ ...o, [group]: (e.target as HTMLDetailsElement).open }))}
-            className="mb-2 rounded-xl border border-border"
+            className="mb-2 rounded-lg border border-border"
           >
             <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
               {GROUP_TITLES[group] ?? group}

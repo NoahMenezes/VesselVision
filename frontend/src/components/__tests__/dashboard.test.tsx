@@ -1,8 +1,8 @@
 /** Smoke tests: disclaimer, empty state, mobile tabs. No fake data asserted. */
 import { describe, expect, test } from "bun:test";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { Dashboard } from "@/components/Dashboard";
-import { Disclaimer, TopBar } from "@/components/TopBar";
+import { Disclaimer } from "@/components/Disclaimer";
 import { StoreProvider } from "@/store/VesselVisionContext";
 
 function shell(ui: React.ReactNode) {
@@ -13,7 +13,6 @@ describe("clinical safety copy", () => {
   test("disclaimer is always visible with the full sentence", () => {
     shell(
       <>
-        <TopBar />
         <Disclaimer />
       </>,
     );
@@ -35,11 +34,12 @@ describe("results empty state", () => {
 describe("mobile section switch", () => {
   test("verb tabs switch visible panels", () => {
     shell(<Dashboard />);
-    const heart = screen.getByRole("button", { name: "Explore heart" });
+    const tabs = within(screen.getByRole("navigation", { name: "Dashboard sections" }));
+    const heart = tabs.getByRole("button", { name: "Explore heart" });
     fireEvent.click(heart);
     expect(heart.getAttribute("aria-pressed")).toBe("true");
     expect(
-      screen.getByRole("button", { name: "Enter data" }).getAttribute("aria-pressed"),
+      tabs.getByRole("button", { name: "Enter data" }).getAttribute("aria-pressed"),
     ).toBe("false");
   });
 });

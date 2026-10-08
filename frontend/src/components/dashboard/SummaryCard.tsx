@@ -26,7 +26,7 @@ export function SummaryCard({ onSelect }: { onSelect: (t: SelectedTarget) => voi
           type="button"
           onClick={() => onSelect("CAD")}
           aria-pressed={selected === "CAD"}
-          className="tnum mt-1 w-full rounded-xl border border-border p-3 text-left hover:bg-white/5"
+          className="tnum mt-1 w-full rounded-lg border border-border p-3 text-left hover:bg-black/[0.04]"
         >
           <span className="text-2xl font-semibold">
             {Math.round(prediction.cad.probability * 100)}%

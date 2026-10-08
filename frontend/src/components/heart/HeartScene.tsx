@@ -15,7 +15,7 @@ import { VesselLegend } from "./VesselLegend";
 function Loader() {
   return (
     <Html center>
-      <div className="rounded-xl border border-border bg-surface px-3 py-2 text-xs">
+      <div className="rounded-lg border border-border bg-surface px-3 py-2 text-xs">
         Loading heart model…
       </div>
     </Html>
@@ -44,7 +44,7 @@ function HeartModelGate() {
   if (state === "missing") {
     return (
       <Html center>
-        <div className="max-w-60 rounded-xl border border-risk-moderate/40 bg-surface p-3 text-xs">
+        <div className="max-w-60 rounded-lg border border-risk-moderate/40 bg-surface p-3 text-xs">
           Heart model file is missing. Add <code>heart.glb</code> per{" "}
           <code>public/models/CREDITS.md</code>. Arteries below still render.
         </div>
@@ -86,7 +86,7 @@ export function HeartScene() {
             type="button"
             aria-label={CAMERA_PRESETS[k].label}
             onClick={() => applyPreset(k)}
-            className="rounded-xl border border-border px-3 py-1 text-xs hover:bg-white/5"
+            className="rounded border border-border px-3 py-1 text-xs hover:bg-black/[0.04]"
           >
             {k === "front" ? "Front" : "Back"}
           </button>
@@ -95,12 +95,12 @@ export function HeartScene() {
           type="button"
           aria-label="Reset camera"
           onClick={() => applyPreset("reset")}
-          className="rounded-xl border border-border px-3 py-1 text-xs hover:bg-white/5"
+          className="rounded border border-border px-3 py-1 text-xs hover:bg-black/[0.04]"
         >
           Reset
         </button>
       </div>
-      <div className="relative h-105 w-full overflow-hidden rounded-xl border border-border">
+      <div className="relative h-105 w-full overflow-hidden rounded-lg border border-border">
         <Canvas
           dpr={[1, 1.5]}
           camera={{ position: [0, 0.2, 3.4], fov: 42 }}

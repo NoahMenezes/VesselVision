@@ -9,11 +9,11 @@ export const HeartCanvas = dynamic(
     loading: () => (
       <div aria-label="Loading 3D heart">
         <div className="mb-2 flex gap-2">
-          <div className="h-7 w-16 animate-pulse rounded-xl bg-white/[0.07]" />
-          <div className="h-7 w-16 animate-pulse rounded-xl bg-white/[0.07]" />
-          <div className="h-7 w-16 animate-pulse rounded-xl bg-white/[0.07]" />
+          <div className="h-7 w-16 animate-pulse rounded bg-black/[0.06]" />
+          <div className="h-7 w-16 animate-pulse rounded bg-black/[0.06]" />
+          <div className="h-7 w-16 animate-pulse rounded bg-black/[0.06]" />
         </div>
-        <div className="h-105 w-full animate-pulse rounded-xl bg-white/[0.05] ring-1 ring-border" />
+        <div className="h-105 w-full animate-pulse rounded-lg bg-black/[0.04] ring-1 ring-border" />
       </div>
     ),
   },

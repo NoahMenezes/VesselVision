@@ -20,6 +20,11 @@ g.ResizeObserver = class {
   unobserve() {}
   disconnect() {}
 };
+g.IntersectionObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 g.matchMedia =
   dom.window.matchMedia?.bind(dom.window) ??
   (() => ({ matches: false, addListener() {}, removeListener() {} }));

@@ -71,7 +71,7 @@ export function ResultsPanel() {
               <button
                 type="button"
                 onClick={() => void predictNow(inputs)}
-                className="mt-2 rounded-xl border border-border px-3 py-1 text-xs hover:bg-white/5"
+                className="mt-2 rounded border border-border px-3 py-1 text-xs hover:bg-black/[0.04]"
               >
                 Retry
               </button>

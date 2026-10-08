@@ -28,7 +28,7 @@ export function VesselCards() {
               aria-pressed={selected === v}
               onClick={() => setSelected(selected === v ? "CAD" : v)}
               className={clsx(
-                "tnum w-full rounded-xl border p-2 text-left text-xs hover:bg-white/5",
+                "tnum w-full rounded-lg border border-border p-2 text-left text-xs hover:bg-black/[0.04]",
                 selected === v ? "border-accent" : "border-border",
               )}
             >
@@ -44,7 +44,7 @@ export function VesselCards() {
               </span>
               <span
                 aria-hidden
-                className="mt-1 block h-1.5 overflow-hidden rounded-full bg-white/10"
+                className="mt-1 block h-1.5 overflow-hidden rounded-full bg-black/[0.08]"
               >
                 <span
                   className="block h-full rounded-full transition-all"

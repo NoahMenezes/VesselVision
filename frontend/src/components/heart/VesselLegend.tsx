@@ -22,7 +22,7 @@ export function VesselLegend() {
   return (
     <div
       aria-label="Artery risk color scale"
-      className="pointer-events-none absolute bottom-2 left-2 flex gap-2 rounded-xl border border-border bg-surface/90 px-2 py-1 text-[11px]"
+      className="pointer-events-none absolute bottom-2 left-2 flex gap-2 rounded-lg border border-border bg-surface/90 px-2 py-1 text-[11px]"
     >
       {BANDS.map((b) => (
         <span key={b.label} className="flex items-center gap-1">
@@ -51,7 +51,7 @@ export function Schematic2D() {
     return p === null ? "#5b8a8a" : riskColor(p);
   };
   return (
-    <div className="mt-2 rounded-xl border border-border p-3">
+    <div className="mt-2 rounded-lg border border-border p-3">
       <p className="mb-1 text-xs text-foreground/60">
         2D schematic (same colors as 3D). Buttons select vessels.
       </p>
@@ -84,8 +84,8 @@ export function Schematic2D() {
                 aria-pressed={selected === v}
                 onClick={() => setSelected(selected === v ? "CAD" : v)}
                 className={clsx(
-                  "tnum rounded-xl border px-3 py-1 text-left text-xs",
-                  selected === v ? "border-accent" : "border-border hover:bg-white/5",
+                  "tnum rounded border px-3 py-1 text-left text-xs",
+                  selected === v ? "border-accent" : "border-border hover:bg-black/[0.04]",
                 )}
               >
                 {v} ({ANATOMY_MAP[v]})

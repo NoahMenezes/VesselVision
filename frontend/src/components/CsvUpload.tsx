@@ -98,7 +98,7 @@ export function CsvUpload() {
           const f = e.dataTransfer.files[0];
           if (f) void handleFile(f);
         }}
-        className={`rounded-xl border border-dashed p-4 text-center text-xs ${drag ? "border-accent" : "border-border text-foreground/60"}`}
+        className={`rounded-lg border border-dashed p-4 text-center text-xs ${drag ? "border-accent" : "border-border text-foreground/60"}`}
       >
         Drop a CSV here or click to browse (max 200 rows)
         <input
@@ -124,14 +124,14 @@ export function CsvUpload() {
               <p className="mb-1 text-foreground/60">
                 {parsed.rows.length} rows. Click one to load it into the form:
               </p>
-              <div className="max-h-40 overflow-auto rounded-xl border border-border">
+              <div className="max-h-40 overflow-auto rounded-lg border border-border">
                 <table className="w-full text-left text-[11px]">
                   <thead>
                     <tr>{parsed.headers.slice(0, 6).map((h) => <th key={h} className="px-2 py-1">{h}</th>)}</tr>
                   </thead>
                   <tbody>
                     {parsed.rows.slice(0, 5).map((r, i) => (
-                      <tr key={i} className="cursor-pointer hover:bg-white/5" onClick={() => loadRow(r)}>
+                      <tr key={i} className="cursor-pointer hover:bg-black/[0.04]" onClick={() => loadRow(r)}>
                         {parsed.headers.slice(0, 6).map((h) => <td key={h} className="px-2 py-1">{r[h]}</td>)}
                       </tr>
                     ))}
