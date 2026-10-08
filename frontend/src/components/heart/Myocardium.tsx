@@ -25,16 +25,22 @@ export function Myocardium() {
       }),
     [],
   );
-  const scene = useMemo(() => {
+  const { scene, scale } = useMemo(() => {
     const clone = gltf.scene.clone();
     clone.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         (obj as THREE.Mesh).material = material;
       }
     });
-    return clone;
+    // Auto-fit ANY heart.glb onto the artery rig: measure first, then scale
+    // to ~1.9 units tall and center on the rig. Never trust a magic constant
+    // (previous file spanned y 0..16.7 and floated out of frame entirely).
+    const box = new THREE.Box3().setFromObject(clone);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const s = size.y > 0 ? 1.9 / size.y : 1;
+    clone.position.set(-center.x * s, -center.y * s + 0.05, -center.z * s);
+    return { scene: clone, scale: s };
   }, [gltf, material]);
-  return <primitive object={scene} scale={0.08} />;
-  // Sketchfab annotated heart spans ~17.7 units tall; 0.08x lands it on the
-  // artery paths (~1.4 units). Recheck whenever heart.glb is swapped.
+  return <primitive object={scene} scale={scale} />;
 }
