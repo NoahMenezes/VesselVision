@@ -1,25 +1,35 @@
 @import "tailwindcss";
 
-/* Dark clinical theme. One accent (teal), one radius system, single risk
- * scale shared by dashboard + 3D heart: green -> amber -> red. */
+/* Deep dark console. Tinted navy base (never pure black), one desaturated
+ * teal accent, hairline borders tinted to the background hue. Risk colors
+ * are semantic state shared by dashboard + 3D heart: green -> amber -> red.
+ */
 :root {
-  --background: #0b1220;
-  --foreground: #e6edf3;
-  --surface: #111c30;
-  --border: #24334d;
-  --accent: #2dd4bf;
-  --risk-low: #22c55e;
-  --risk-moderate: #f59e0b;
-  --risk-high: #ef4444;
-  --radius: 0.75rem;
+  --background: #070d1a;
+  --background-soft: #0a1224;
+  --foreground: #dbe4f0;
+  --muted: #8b98ad;
+  --surface: #0d1628;
+  --surface-raised: #12203a;
+  --border: #1b2a45;
+  --accent: #3aa99b;
+  --accent-strong: #4cc4b4;
+  --risk-low: #34c77b;
+  --risk-moderate: #e8a33d;
+  --risk-high: #e5484d;
+  --radius: 0.625rem;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-soft: var(--background-soft);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
   --color-risk-low: var(--risk-low);
   --color-risk-moderate: var(--risk-moderate);
   --color-risk-high: var(--risk-high);
@@ -31,6 +41,14 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+  letter-spacing: -0.01em;
 }
 
 html {
@@ -39,7 +57,7 @@ html {
 
 ::selection {
   background: var(--accent);
-  color: #000;
+  color: #04110f;
 }
 
 /* Visible keyboard focus everywhere (accessibility, not optional). */
@@ -48,7 +66,7 @@ select:focus-visible,
 button:focus-visible,
 summary:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
 }
 
@@ -63,11 +81,12 @@ summary:focus-visible,
   left: -9999px;
   top: 0;
   z-index: 50;
-  background: var(--accent);
-  color: #000;
+  background: var(--accent-strong);
+  color: #04110f;
   padding: 0.5rem 1rem;
   border-radius: 0 0 var(--radius) 0;
   font-size: 0.875rem;
+  font-weight: 600;
 }
 .skip-link:focus {
   left: 0;

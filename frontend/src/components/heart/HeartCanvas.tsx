@@ -7,8 +7,13 @@ export const HeartCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-105 items-center justify-center rounded-xl border border-border text-xs text-foreground/60">
-        Preparing 3D view…
+      <div aria-label="Loading 3D heart">
+        <div className="mb-2 flex gap-2">
+          <div className="h-7 w-16 animate-pulse rounded-xl bg-white/[0.07]" />
+          <div className="h-7 w-16 animate-pulse rounded-xl bg-white/[0.07]" />
+          <div className="h-7 w-16 animate-pulse rounded-xl bg-white/[0.07]" />
+        </div>
+        <div className="h-105 w-full animate-pulse rounded-xl bg-white/[0.05] ring-1 ring-border" />
       </div>
     ),
   },

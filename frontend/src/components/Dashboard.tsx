@@ -9,7 +9,6 @@ import { useStore } from "@/store/VesselVisionContext";
 import { Disclaimer, TopBar } from "./TopBar";
 import { HeartPanel, InputPanel, ResultsPanel } from "./panels";
 import { Onboarding } from "./Onboarding";
-import { Button } from "./ui";
 
 const TABS = [
   { id: "input", label: "Enter data" },
@@ -26,7 +25,7 @@ export function Dashboard() {
   }, [setBackend]);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-dvh flex-col">
       <TopBar />
       <Disclaimer />
       <Onboarding />
@@ -43,18 +42,24 @@ export function Dashboard() {
           The layout below is a preview; predictions need the API.
         </div>
       )}
-      {/* Mobile tabs */}
-      <nav aria-label="Dashboard sections" className="flex gap-2 p-3 lg:hidden">
-        {TABS.map((t) => (
-          <Button
-            key={t.id}
-            variant={tab === t.id ? "primary" : "ghost"}
-            onClick={() => setTab(t.id)}
-            aria-pressed={tab === t.id}
-          >
-            {t.label}
-          </Button>
-        ))}
+      {/* Mobile segmented section switch */}
+      <nav aria-label="Dashboard sections" className="p-3 lg:hidden">
+        <div role="group" className="grid grid-cols-3 rounded-xl bg-surface p-1 ring-1 ring-border">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTab(t.id)}
+              aria-pressed={tab === t.id}
+              className={clsx(
+                "rounded-lg px-2 py-2 text-[13px] font-semibold transition-colors duration-200",
+                tab === t.id ? "bg-surface-raised text-foreground" : "text-muted hover:text-foreground",
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </nav>
       <main id="main" className="grid flex-1 grid-cols-1 gap-3 p-3 lg:grid-cols-[320px_1fr_320px]">
         <div className={clsx(tab === "input" ? "block" : "hidden", "lg:block")}>

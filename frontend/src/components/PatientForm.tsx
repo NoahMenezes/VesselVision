@@ -19,6 +19,24 @@ const GROUP_TITLES: Record<string, string> = {
 };
 const GROUP_ORDER = ["demographic", "symptom_exam", "ecg", "lab_echo"];
 
+/** Encounter-flow ordering within each group: presenting complaint and vitals
+ *  first, history checkboxes last. Unlisted fields follow alphabetically. */
+const GROUP_PRIORITY: Record<string, string[]> = {
+  demographic: ["age", "sex", "weight", "length", "bmi", "current_smoker", "ex_smoker"],
+  symptom_exam: [
+    "typical_chest_pain", "atypical", "nonanginal", "dyspnea", "bp", "pr",
+    "edema", "function_class", "lowth_ang",
+  ],
+  ecg: ["st_elevation", "st_depression", "tinversion", "q_wave", "lvh", "bbb"],
+  lab_echo: ["ldl", "hdl", "tg", "fbs", "ef_tte", "region_rwma", "vhd"],
+};
+
+function orderFields(fields: string[], group: string): string[] {
+  const prio = GROUP_PRIORITY[group] ?? [];
+  const rank = new Map(prio.map((n, i) => [n, i]));
+  return fields.slice().sort((a, b) => (rank.get(a) ?? 999) - (rank.get(b) ?? 999));
+}
+
 const BBB_OPTIONS = ["N", "LBBB", "RBBB"];
 const VHD_OPTIONS = [
   { value: 0, label: "None" },
@@ -209,7 +227,10 @@ export function PatientForm() {
       </label>
 
       {GROUP_ORDER.map((group) => {
-        const fields = names.filter((n) => schema.features[n].group === group && matches(n));
+        const fields = orderFields(
+          names.filter((n) => schema.features[n].group === group && matches(n)),
+          group,
+        );
         if (fields.length === 0) return null;
         const isOpen = open[group] ?? false;
         return (
