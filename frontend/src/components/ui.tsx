@@ -1,13 +1,13 @@
 import { clsx } from "clsx";
 
-/** Tonal surfaces carry hierarchy (no everywhere-borders); hairlines only
- *  separate, never decorate. All interactive elements: 200ms transitions +
- *  press feedback. */
+/** Editorial surfaces: white cards, single hairline, one soft layered
+ *  shadow. Shine comes only from top-inner highlights on pills/chips. */
 export function Card({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <section
       className={clsx(
-        "rounded-xl bg-surface p-4 shadow-[0_1px_12px_rgba(2,8,23,0.55)] ring-1 ring-border",
+        "rounded-lg border border-border-soft bg-surface p-5",
+        "shadow-[0_1px_2px_rgba(18,18,18,0.04),0_8px_24px_-12px_rgba(18,18,18,0.12)]",
         className,
       )}
     >
@@ -18,15 +18,15 @@ export function Card({ className, children }: { className?: string; children: Re
 
 export function Badge({ tone, children }: { tone: "low" | "moderate" | "high" | "neutral"; children: React.ReactNode }) {
   const tones = {
-    low: "bg-risk-low/15 text-risk-low ring-risk-low/30",
-    moderate: "bg-risk-moderate/15 text-risk-moderate ring-risk-moderate/30",
-    high: "bg-risk-high/15 text-risk-high ring-risk-high/30",
-    neutral: "bg-white/5 text-muted ring-border",
+    low: "bg-pill-green-bg text-risk-low",
+    moderate: "bg-risk-moderate/10 text-risk-moderate",
+    high: "bg-risk-high/10 text-risk-high",
+    neutral: "bg-surface-soft text-muted",
   } as const;
   return (
     <span
       className={clsx(
-        "tnum inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em] ring-1",
+        "tnum shine inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.05em]",
         tones[tone],
       )}
     >
@@ -41,10 +41,10 @@ export function Button({
   return (
     <button
       className={clsx(
-        "rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 disabled:opacity-50 active:scale-[0.98]",
+        "rounded px-4 py-2 text-sm font-semibold transition-all duration-200 disabled:opacity-50 active:scale-[0.98]",
         variant === "primary"
-          ? "bg-accent text-[#04110f] hover:bg-accent-strong"
-          : "text-foreground ring-1 ring-border hover:bg-white/5",
+          ? "bg-foreground text-white hover:opacity-90"
+          : "border border-border bg-surface text-foreground hover:bg-surface-soft",
         className,
       )}
       {...props}
@@ -53,14 +53,14 @@ export function Button({
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={clsx("animate-pulse rounded-lg bg-white/[0.07]", className)} />;
+  return <div className={clsx("animate-pulse rounded-lg bg-rail", className)} />;
 }
 
 export function Tooltip({ tip, children }: { tip: string; children: React.ReactNode }) {
   return (
     <span className="group relative inline-flex cursor-help">
       {children}
-      <span className="pointer-events-none absolute left-1/2 top-full z-10 hidden w-48 -translate-x-1/2 rounded-lg bg-surface-raised p-2 text-xs ring-1 ring-border group-hover:block">
+      <span className="pointer-events-none absolute left-1/2 top-full z-10 hidden w-48 -translate-x-1/2 rounded-lg border border-border-soft bg-surface p-2 text-xs text-foreground shadow-lg group-hover:block">
         {tip}
       </span>
     </span>
