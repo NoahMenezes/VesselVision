@@ -2,6 +2,7 @@
 import { Card, Skeleton } from "./ui";
 import { CsvUpload } from "./CsvUpload";
 import { PatientForm } from "./PatientForm";
+import { HeartCanvas } from "./heart/HeartCanvas";
 import { useStore } from "@/store/VesselVisionContext";
 
 /** Phase 9: schema-driven form + samples + CSV upload (live against /schema). */
@@ -14,7 +15,8 @@ export function InputPanel() {
   );
 }
 
-/** Phase 10 mounts the R3F HeartScene here (dynamic import, ssr:false). */
+/** Phase 10: live 3D heart (GLB myocardium + separate LAD/LCX/RCA tubes).
+ *  Probability colors + pulse arrive in Phase 11. */
 export function HeartPanel() {
   return (
     <Card className="flex min-h-80 flex-col">
@@ -23,9 +25,7 @@ export function HeartPanel() {
         Rotate and zoom. Arteries recolor green to red by predicted
         stenosis probability; click a vessel to inspect it.
       </p>
-      <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border text-sm text-foreground/50">
-        Heart canvas loads here (Phase 10)
-      </div>
+      <HeartCanvas />
     </Card>
   );
 }
