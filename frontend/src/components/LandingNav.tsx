@@ -1,15 +1,19 @@
 "use client";
 /** Landing navbar: brand left, auth right. Degrades to setup guidance
  *  until Clerk keys exist (see src/lib/auth.ts).
+ *
+ *  NOTE (@clerk/nextjs v7): SignedIn/SignedOut control components were
+ *  removed upstream and throw by design; conditional UI uses useAuth().
  */
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import { HeartPulse } from "lucide-react";
 import { clerkConfigured } from "@/lib/auth";
 import { Button } from "@/components/ui";
 
 export function LandingNav() {
   const configured = clerkConfigured();
+  const { isSignedIn } = useAuth();
   return (
     <header className="flex h-14 items-center justify-between border-b border-border-soft px-4 lg:px-6">
       <Link href="/" className="flex items-center gap-2">
@@ -18,24 +22,21 @@ export function LandingNav() {
         <span className="hidden text-xs text-muted sm:inline">Track A · CAD risk</span>
       </Link>
       <div className="flex items-center gap-2">
-        {configured ? (
-          <>
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button variant="ghost">Sign in</Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/console">
-                <Button>Open console</Button>
-              </Link>
-              <UserButton />
-            </SignedIn>
-          </>
-        ) : (
+        {!configured ? (
           <span className="text-xs text-muted" title="Paste Clerk keys into frontend/.env.local to enable sign-in">
             Sign-in needs Clerk keys
           </span>
+        ) : isSignedIn ? (
+          <>
+            <Link href="/console">
+              <Button>Open console</Button>
+            </Link>
+            <UserButton />
+          </>
+        ) : (
+          <SignInButton mode="modal">
+            <Button variant="ghost">Sign in</Button>
+          </SignInButton>
         )}
       </div>
     </header>

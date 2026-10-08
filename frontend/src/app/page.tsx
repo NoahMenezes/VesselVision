@@ -1,9 +1,7 @@
-import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { clerkConfigured } from "@/lib/auth";
 import { Disclaimer } from "@/components/Disclaimer";
 import { HeroHeart } from "@/components/HeroHeart";
 import { LandingNav } from "@/components/LandingNav";
+import { StartButton } from "@/components/StartButton";
 import { Button } from "@/components/ui";
 
 const STEPS = [
@@ -17,32 +15,6 @@ const STATS: [string, string][] = [
   ["54", "clinical fields"],
   ["4", "targets: CAD, LAD, LCX, RCA"],
 ];
-
-function StartButton() {
-  const configured = clerkConfigured();
-  if (!configured) {
-    return (
-      <span className="flex flex-col gap-1">
-        <Button>Open console</Button>
-        <span className="text-[11px] text-muted">Auth activates after Clerk keys are added.</span>
-      </span>
-    );
-  }
-  return (
-    <>
-      <SignedOut>
-        <SignInButton mode="modal">
-          <Button>Sign in to start</Button>
-        </SignInButton>
-      </SignedOut>
-      <SignedIn>
-        <Link href="/console">
-          <Button>Open console</Button>
-        </Link>
-      </SignedIn>
-    </>
-  );
-}
 
 export default function Landing() {
   return (
