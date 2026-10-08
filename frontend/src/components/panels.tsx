@@ -1,7 +1,12 @@
 "use client";
-import { Card, Skeleton } from "./ui";
+import { Card } from "./ui";
 import { CsvUpload } from "./CsvUpload";
 import { PatientForm } from "./PatientForm";
+import { MeasurementsTable } from "./dashboard/MeasurementsTable";
+import { PerformanceTab } from "./dashboard/PerformanceTab";
+import { ShapPanel } from "./dashboard/ShapPanel";
+import { SummaryCard } from "./dashboard/SummaryCard";
+import { VesselCards } from "./dashboard/VesselCards";
 import { HeartCanvas } from "./heart/HeartCanvas";
 import { Schematic2D } from "./heart/VesselLegend";
 import { useStore } from "@/store/VesselVisionContext";
@@ -32,33 +37,39 @@ export function HeartPanel() {
   );
 }
 
-/** Phase 12 builds gauges, vessel cards, SHAP chart, and report export here.
- *  Until the first prediction exists, a composed empty state (not blank,
- *  not fake numbers); skeletons only while loading. */
+/** Phase 12: clinical dashboard. Each piece reads the store and degrades
+ *  honestly pre-training (empty states, never fake numbers). */
 export function ResultsPanel() {
-  const { prediction, loading, error } = useStore();
+  const { prediction, loading, error, setSelected } = useStore();
+  const showEmpty = !prediction && !loading;
   return (
-    <Card>
-      <h2 className="mb-1 font-medium">Results</h2>
-      {loading && !prediction ? (
-        <>
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="mt-2 h-16 w-full" />
-        </>
-      ) : prediction ? (
-        <p className="tnum text-xs text-foreground/60">
-          Prediction received. Gauges, vessel cards, and SHAP breakdown land here in Phase 12.
-        </p>
+    <div className="space-y-3">
+      {showEmpty ? (
+        <Card>
+          <h2 className="mb-1 font-medium">Results</h2>
+          <div className="rounded-xl border border-dashed border-border p-4 text-xs text-foreground/60">
+            <p className="font-medium text-foreground">No prediction yet.</p>
+            <p className="mt-1">
+              Fill the form or load an example patient, then press Predict.
+              Every number here will come from the API.
+            </p>
+            {error ? <p className="mt-2 text-risk-moderate">{error}</p> : null}
+          </div>
+        </Card>
       ) : (
-        <div className="rounded-xl border border-dashed border-border p-4 text-xs text-foreground/60">
-          <p className="font-medium text-foreground">No prediction yet.</p>
-          <p className="mt-1">
-            Fill the form or load an example patient, then press Predict.
-            Every number here will come from the API.
-          </p>
-          {error ? <p className="mt-2 text-risk-moderate">{error}</p> : null}
-        </div>
+        <>
+          <SummaryCard onSelect={(t) => setSelected(t)} />
+          <VesselCards />
+          <ShapPanel />
+          {error ? (
+            <Card>
+              <p className="text-xs text-risk-moderate">{error}</p>
+            </Card>
+          ) : null}
+        </>
       )}
-    </Card>
+      <MeasurementsTable />
+      <PerformanceTab />
+    </div>
   );
 }
