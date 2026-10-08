@@ -1,0 +1,16 @@
+feature,label,mean_abs_shap
+typical_chest_pain,typical_chest_pain,0.5747010234510536
+atypical,Atypical chest pain,0.3149216999675715
+region_rwma,region_rwma,0.288758202547926
+age,Age,0.2781412017787426
+dm,Diabetes mellitus,0.2772963229325335
+htn,Hypertension,0.27669765704247656
+tinversion,T inversion,0.2637419453201946
+sex,Sex,0.17593401258428135
+bp,Blood pressure (systolic),0.17437326163041758
+k,Potassium,0.16052778136722132
+ef_tte,ef_tte,0.14714804341015766
+fh,Family history of CAD,0.14471045263454962
+st_depression,st_depression,0.1426728939554616
+dyspnea,Dyspnea,0.1398528244970603
+pr,Pulse rate,0.13955527788472544

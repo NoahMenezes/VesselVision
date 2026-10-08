@@ -1,0 +1,16 @@
+feature,label,mean_abs_shap
+age,Age,0.6513069
+tg,Triglycerides,0.39984468
+typical_chest_pain,typical_chest_pain,0.3500756
+cr,Creatinine,0.34485617
+fbs,Fasting blood sugar,0.25036877
+plt,Platelets,0.24909382
+bun,Blood urea nitrogen,0.22080976
+k,Potassium,0.20685317
+bmi,BMI,0.20359677
+ldl,LDL cholesterol,0.17466387
+wbc,WBC,0.17336802
+na,Sodium,0.17313123
+esr,ESR,0.17122735
+neut,Neutrophils,0.16358583
+weight,Weight,0.1635247

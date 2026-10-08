@@ -52,9 +52,17 @@ def _raw_key(transformed: str, feats: list[str]) -> str:
     return base if base in feats else transformed
 
 
+def _base_pipeline(model):
+    """Unwrap CalibratedClassifierCV to the fitted base pipeline (SHAP needs
+    named_steps; calibration is fit-time only for explanation purposes)."""
+    if type(model).__name__ == "CalibratedClassifierCV":
+        return model.calibrated_classifiers_[0].estimator
+    return model
+
+
 def _build_explainer(target: str) -> dict[str, Any]:
     state = ensure_trained()
-    pipe = state["models"][target]
+    pipe = _base_pipeline(state["models"][target])
     df, registry = clean()
     feats = get_feature_columns(target, list(df.columns))
     pre = pipe.named_steps["pre"]
@@ -68,8 +76,16 @@ def _build_explainer(target: str) -> dict[str, Any]:
     if est_name in ("RandomForestClassifier", "XGBClassifier", "LGBMClassifier"):
         import shap
 
-        explainer = shap.TreeExplainer(clf, data=background)
-        method = "shap-tree"
+        try:
+            explainer = shap.TreeExplainer(clf, data=background)
+            # Probe: some XGBoost builds reject interventional perturbation.
+            explainer.shap_values(background[:2])
+            method = "shap-tree"
+        except NotImplementedError:
+            explainer = shap.TreeExplainer(
+                clf, feature_perturbation="tree_path_dependent"
+            )
+            method = "shap-tree-path"
     elif est_name == "LogisticRegression":
         import shap
 
@@ -97,30 +113,32 @@ def _get(target: str) -> dict[str, Any]:
     return _explainers[target]
 
 
-def _patient_frame(coerced: dict[str, Any], bundle: dict) -> tuple[np.ndarray, dict]:
+def _patient_frame(coerced: dict[str, Any], bundle: dict) -> tuple[np.ndarray, pd.DataFrame, dict]:
     row: dict[str, Any] = {}
     medians = _state.get("medians") or {}
     for c in bundle["feats"]:
         row[c] = coerced.get(c, medians.get(c))
     row["bbb"] = coerced.get("bbb", "N")
     frame = pd.DataFrame([row], columns=bundle["feats"])
-    return np.asarray(bundle["pre"].transform(frame)), row
-
-
-def _scalar_base(raw_base: Any) -> float:
-    arr = np.asarray(raw_base).ravel()
-    return float(arr[1] if len(arr) > 1 else arr[0])
+    return np.asarray(bundle["pre"].transform(frame)), frame, row
 
 
 def _margin_matrix(bundle: dict, Xt: np.ndarray) -> tuple[float, np.ndarray]:
-    """(base_value, shap matrix) in margin space for any row count."""
+    """(base_value, shap matrix) in margin space for any row count.
+
+    Handles all SHAP output shapes: 2-D (n, f), per-class lists, and 3-D
+    (n, f, 2) arrays from newer TreeExplainer binary classifiers.
+    """
     sv = bundle["explainer"].shap_values(Xt)
-    if isinstance(sv, list):  # binary TreeExplainer may return per-class list
-        sv = sv[1]
-    mat = np.asarray(sv)
-    if mat.ndim == 1:
-        mat = mat.reshape(1, -1)
-    return _scalar_base(bundle["explainer"].expected_value), mat
+    arr = np.asarray(sv)
+    if arr.ndim == 3:  # (n_samples, n_features, n_classes) -> positive class
+        arr = arr[:, :, 1]
+    elif isinstance(sv, list):
+        arr = np.asarray(sv[1])
+    mat = np.atleast_2d(arr)
+    raw_base = np.asarray(bundle["explainer"].expected_value).ravel()
+    base = float(raw_base[1] if raw_base.size > 1 else raw_base[0])
+    return base, mat
 
 
 def _lime_fallback(bundle: dict, Xt: np.ndarray) -> tuple[float, np.ndarray, str]:
@@ -160,9 +178,9 @@ def explain(patient_dict: dict[str, Any], target: str) -> dict[str, Any]:
     coerced, errors = validate_inputs(patient_dict)
     if errors:
         raise ValueError("; ".join(errors))
-    ensure_trained()  # 503-style guard: no models, no explanation
+    state = ensure_trained()  # 503-style guard: no models, no explanation
     bundle = _get(target)
-    Xt, raw_row = _patient_frame(coerced, bundle)
+    Xt, frame, raw_row = _patient_frame(coerced, bundle)
     try:
         base, mat = _margin_matrix(bundle, Xt)
         method = bundle["method"]
@@ -170,9 +188,12 @@ def explain(patient_dict: dict[str, Any], target: str) -> dict[str, Any]:
         base, vec, method = _lime_fallback(bundle, Xt)
         mat = vec.reshape(1, -1)
     sv = mat[0]
-    # NOTE: Xt is already preprocessed -> predict with the classifier head,
-    # not the full pipeline (which would transform twice).
-    proba = float(bundle["clf"].predict_proba(Xt)[:, 1][0])
+    # Reported probability comes from the FULL saved model (calibrated when
+    # Phase 5 chose calibration); SHAP runs on the unwrapped base estimator.
+    # _feature_row builds the raw frame the pipeline expects.
+    from app.predict import _feature_row
+
+    proba = float(state["models"][target].predict_proba(_feature_row(coerced, target))[:, 1][0])
     order = np.argsort(-np.abs(sv))[:10]
     contributions = []
     for i in order:

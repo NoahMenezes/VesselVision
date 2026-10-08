@@ -38,7 +38,7 @@ def test_shap_additivity_cad_logreg():
     coerced, errors = validate_inputs(row)
     assert not errors
     bundle = _get("CAD")
-    Xt, _ = _patient_frame(coerced, bundle)
+    Xt, _, _ = _patient_frame(coerced, bundle)
     base, mat = _margin_matrix(bundle, Xt)
     proba = float(bundle["clf"].predict_proba(Xt)[:, 1][0])
     assert abs(1 / (1 + exp(-(base + mat[0].sum()))) - proba) < 1e-6

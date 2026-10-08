@@ -1,4 +1,8 @@
-# REMAINING: full Phase 4 training run (DEFERRED, not skipped)
+# Training: COMPLETE (was deferred, finished Oct 8)
+
+Full 24-row `cv_results.csv` (4 targets x 6 arms, 5x3 CV, seed 42,
+`N_JOBS=4` run) is committed. Phase 5 evaluation executed on it; see
+`backend/artifacts/` and `docs/VesselVision_Documentation.md` sections 4-6.
 
 ## Done
 

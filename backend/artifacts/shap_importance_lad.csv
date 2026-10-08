@@ -1,0 +1,16 @@
+feature,label,mean_abs_shap
+typical_chest_pain,typical_chest_pain,0.06341460213885783
+ef_tte,ef_tte,0.04180029991082798
+region_rwma,region_rwma,0.036842276346438003
+atypical,Atypical chest pain,0.03518615433496139
+age,Age,0.025118108909951645
+tinversion,T inversion,0.018321797286068378
+esr,ESR,0.016410876195799035
+htn,Hypertension,0.011335842923978542
+pr,Pulse rate,0.009467531774179506
+neut,Neutrophils,0.009327787961262369
+lymph,Lymphocytes,0.008802838200242597
+bp,Blood pressure (systolic),0.008075567544970193
+wbc,WBC,0.007558149352001004
+cr,Creatinine,0.007558010840706501
+weight,Weight,0.007308793282228054

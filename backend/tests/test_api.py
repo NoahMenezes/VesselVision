@@ -1,18 +1,33 @@
-"""API tests (Phase 7). Uses FastAPI TestClient; lifespan loads artifacts.
+"""API tests (Phase 7 + live Phase 5 artifacts).
 
-Pre-training expectations: /schema + /samples work (200); model routes
-answer 503 with rerun guidance; validation still returns 422 first.
+Validation tests (422/413) use a bare client: they run before any trained
+check, so they pass with or without models. Live tests use a lifespan client
+that loads the joblib artifacts; they require Phase 5 output.
 """
 
 import io
 
 import pandas as pd
+import pytest
 from fastapi.testclient import TestClient
 
 from app.data import clean
 from main import app
 
 client = TestClient(app)
+
+
+@pytest.fixture(scope="module")
+def live():
+    with TestClient(app) as c:
+        yield c
+
+
+def test_root_reports_trained_state():
+    with TestClient(app) as c:
+        body = c.get("/").json()
+    assert body["service"] == "VesselVision API"
+    assert body["models_trained"] is True
 
 
 def test_health():
@@ -52,20 +67,25 @@ def _one_valid_input() -> dict:
     }
 
 
-def test_predict_503_until_trained():
-    res = client.post("/predict", json={"inputs": _one_valid_input()})
-    assert res.status_code == 503
-    assert "train" in res.json()["detail"].lower()
+def test_predict_live(live):
+    res = live.post("/predict", json={"inputs": _one_valid_input()})
+    assert res.status_code == 200
+    body = res.json()
+    assert set(body) == {"cad", "vessels"}
+    assert set(body["vessels"]) == {"LAD", "LCX", "RCA"}
+    for risk in [body["cad"], *body["vessels"].values()]:
+        assert 0.0 <= risk["probability"] <= 1.0
+        assert risk["label"] in (0, 1)
 
 
-def test_predict_accepts_form_strings():
-    """Form-style strings must coerce (503 = passed validation, untrained)."""
+def test_predict_accepts_form_strings(live):
+    """Form-style strings must coerce to a live prediction."""
     body = _one_valid_input()
     body["sex"] = "Male"
     body["bbb"] = "LBBB"
     body["vhd"] = "Moderate"
-    res = client.post("/predict", json={"inputs": body})
-    assert res.status_code == 503
+    res = live.post("/predict", json={"inputs": body})
+    assert res.status_code == 200
     bad = _one_valid_input()
     bad["sex"] = "Unknown"
     res = client.post("/predict", json={"inputs": bad})
@@ -87,9 +107,13 @@ def test_predict_rejects_unknown_fields():
     assert res.status_code == 422
 
 
-def test_explain_503_until_trained():
-    res = client.post("/explain", json={"inputs": _one_valid_input(), "target": "CAD"})
-    assert res.status_code == 503
+def test_explain_live(live):
+    res = live.post("/explain", json={"inputs": _one_valid_input(), "target": "LAD"})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["target"] == "LAD"
+    assert 1 <= len(body["contributions"]) <= 10
+    assert all("shap_value" in c and "direction" in c for c in body["contributions"])
 
 
 def test_explain_rejects_bad_target():
@@ -97,9 +121,10 @@ def test_explain_rejects_bad_target():
     assert res.status_code == 422
 
 
-def test_metrics_503_until_trained():
-    res = client.get("/metrics")
-    assert res.status_code == 503
+def test_metrics_live(live):
+    res = live.get("/metrics")
+    assert res.status_code == 200
+    assert set(res.json()) == {"CAD", "LAD", "LCX", "RCA"}
 
 
 def _csv_bytes(frame: pd.DataFrame) -> bytes:

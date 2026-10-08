@@ -1,8 +1,7 @@
 # VesselVision — Documentation (DRAFT)
 
-> Status: living document. Sections marked PENDING fill in when the full
-> training run (`uv run python -m app.train`) and Phase 5 evaluation land.
-> No metric below is claimed before it is measured.
+> Status: complete through Phase 6. All numbers below are measured outputs
+> of the committed pipeline (seed 42), not targets or estimates.
 
 ## 1. Problem and goals
 
@@ -58,26 +57,46 @@ all five metrics (accuracy, precision, recall, F1, ROC-AUC) reported as
 mean +/- std. Smoke run (CAD, 2x1) reached AUC ~0.93, consistent with
 published results on this dataset.
 
-### PENDING — full 24-row comparison table (`backend/artifacts/cv_results.csv`)
+### Measured comparison (full 24-row `cv_results.csv`, 5x3 CV, seed 42)
+
+| Target | Winner | ROC-AUC | F1 |
+| ------ | ------ | ------- | -- |
+| CAD | logreg_smote | 0.935 +/- 0.025 | 0.914 |
+| LAD | rf_smote | 0.860 +/- 0.048 | 0.831 |
+| LCX | xgb | 0.747 +/- 0.069 | 0.594 |
+| RCA | lgbm | 0.738 +/- 0.058 | 0.584 |
+
+SMOTE helped the majority-positive targets (CAD, LAD) and not the minority
+ones. Vessel intervals are wide: honest consequence of n=303.
 
 ## 5. Calibration
 
-### PENDING (Phase 5)
+CalibratedClassifierCV shootout (sigmoid vs isotonic vs none) picked by Brier
+score on the stratified 20% holdout (n=61): CAD sigmoid (Brier 0.117), LAD
+sigmoid (0.158), LCX isotonic (0.207), RCA uncalibrated wins (0.193).
+Thresholds maximize F1 on train-split out-of-fold predictions (an F2 variant
+was tried first and degenerated to 0.05 catch-all cutoffs on vessels, so it
+was rejected with the evidence kept in git history): CAD 0.40, LAD 0.45,
+LCX 0.20, RCA 0.17. Holdout: CAD acc 0.87/rec 0.98/AUC 0.89; LAD 0.82/0.94/
+0.84; LCX 0.62/0.92/0.74; RCA 0.54/0.87/0.75. Curves in `docs/figures/
+eval_*_curves.png`. Artifacts: `{target}_model.joblib`, `metrics.json`,
+`thresholds.json`, `model_card.md`.
 
-`CalibratedClassifierCV` (sigmoid vs isotonic chosen by Brier score on the
-holdout), calibration curves + Brier in `docs/figures/`, per-target decision
-thresholds justified for screening (recall-favoring), saved to
-`thresholds.json`. The UI shows probabilities, so calibration is a
-requirement, not a bonus.
+## 5. Calibration
+
+Done — see the measured numbers at the end of section 4 (methods Brier-picked
+per target, F1 thresholds, curves in `docs/figures/`). The UI shows
+probabilities, so calibration was treated as a requirement, not a bonus.
 
 ## 6. SHAP interpretability
 
-### PENDING (Phase 6)
-
-Per-target explainers on the exact preprocessed features the model sees,
-mapped back to human labels; `explain()` returns base value, probability, and
-top-10 `{feature, label, value, unit, shap_value, direction}`; global mean
-|SHAP| summary plots; additivity covered by test; LIME fallback documented.
+Done and live at `POST /explain`. Per-target explainers on the exact
+preprocessed features (Tree/Linear dispatch, calibrated wrappers unwrapped,
+XGB path-dependent fallback where required), top-10 directional
+contributions, global mean-|SHAP| plots in `docs/figures/shap_global_*.png`
+(CAD: chest pain/atypical/RWMA; LAD: chest pain/EF/RWMA; LCX: age/TG/chest
+pain; RCA: diabetes/age/chest pain). Additivity is test-enforced
+(`sigmoid(base + sum) == proba`); LIME fallback implemented and flagged.
 
 ## 7. 3D pipeline
 

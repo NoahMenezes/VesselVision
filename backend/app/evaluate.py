@@ -9,8 +9,8 @@ Flow per target (CAD/LAD/LCX/RCA):
    only -- no best_params string parsing, no holdout peeking.
 4. Calibration: CalibratedClassifierCV sigmoid vs isotonic, picked by Brier
    score on the holdout (UI shows probabilities, so this is required).
-5. Thresholds: F2-maximizing cutoff from cross_val_predict on the train
-   split (screening favors recall); documented in thresholds.json.
+5. Thresholds: F1-maximizing cutoff from cross_val_predict on the train
+   split (F2 degenerated to catch-all 0.05 on vessels; documented); saved to thresholds.json.
 6. Report holdout metrics (accuracy/precision/recall/F1/ROC-AUC, confusion
    matrix, ROC/PR/calibration curves to docs/figures/), then refit the
    winning pipeline on ALL data and save joblib + metrics.json +
@@ -75,17 +75,24 @@ def pick_winners(cv_csv: Path) -> dict[str, dict]:
     return winners
 
 
-def f2_threshold(y_true: np.ndarray, proba: np.ndarray) -> float:
-    """Cutoff maximizing F2 (recall-weighted) over a grid."""
-    best_t, best_f2 = 0.5, -1.0
+def f1_threshold(y_true: np.ndarray, proba: np.ndarray) -> float:
+    """Cutoff maximizing F1 over a grid.
+
+    F2 (recall-weighted) was tried first and degenerated to near-zero
+    catch-all cutoffs (0.05) on the vessel targets at n=303: recall 1.0 with
+    precision ~0.4, i.e. the threshold stops meaning anything. F1 keeps a
+    balanced operating point; ranking quality is judged by AUC anyway, and
+    the UI always shows the underlying probability next to the label.
+    """
+    best_t, best_f1 = 0.5, -1.0
     for t in np.linspace(0.05, 0.95, 37):
         pred = (proba >= t).astype(int)
         tp = int(((pred == 1) & (y_true == 1)).sum())
         fp = int(((pred == 1) & (y_true == 0)).sum())
         fn = int(((pred == 0) & (y_true == 1)).sum())
-        f2 = (5 * tp) / (5 * tp + 4 * fn + fp) if (tp + fp + fn) > 0 else 0.0
-        if f2 > best_f2:
-            best_t, best_f2 = t, f2
+        f1 = (2 * tp) / (2 * tp + fp + fn) if (tp + fp + fn) > 0 else 0.0
+        if f1 > best_f1:
+            best_t, best_f1 = t, f1
     return round(float(best_t), 2)
 
 
@@ -126,7 +133,7 @@ def evaluate_target(df: pd.DataFrame, target: str, winner_model: str) -> dict:
     oof = cross_val_predict(
         clone(search.best_estimator_), Xtr, ytr, cv=inner, method="predict_proba", n_jobs=N_JOBS
     )[:, 1]
-    threshold = f2_threshold(ytr, oof)
+    threshold = f1_threshold(ytr, oof)
     pred_te = (proba_te >= threshold).astype(int)
     metrics = {
         "accuracy": round(float(accuracy_score(yte, pred_te)), 4),
@@ -157,7 +164,8 @@ def evaluate_target(df: pd.DataFrame, target: str, winner_model: str) -> dict:
 
 
 def _save_figures(target: str, yte, proba_te, pred_te) -> None:
-    from sklearn.metrics import CalibrationDisplay, PrecisionRecallDisplay, RocCurveDisplay
+    from sklearn.calibration import CalibrationDisplay
+    from sklearn.metrics import PrecisionRecallDisplay, RocCurveDisplay
 
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.5))
