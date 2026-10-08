@@ -1,19 +1,14 @@
 import { Card, Skeleton } from "./ui";
+import { CsvUpload } from "./CsvUpload";
+import { PatientForm } from "./PatientForm";
 
-/** Phase 9 builds the schema-driven form here (GET /schema groups:
- *  Demographics, Exam, Labs, ECG, Echo + samples + CSV upload). */
+/** Phase 9: schema-driven form + samples + CSV upload (live against /schema). */
 export function InputPanel() {
   return (
-    <Card>
-      <h2 className="mb-1 font-medium">Patient input</h2>
-      <p className="mb-3 text-xs text-foreground/60">
-        Step 1 of 3: enter clinical data or load an example patient. The form
-        generates from the backend schema so it always matches the model.
-      </p>
-      <Skeleton className="h-9 w-full" />
-      <Skeleton className="mt-2 h-9 w-full" />
-      <Skeleton className="mt-2 h-9 w-2/3" />
-    </Card>
+    <div className="space-y-3">
+      <PatientForm />
+      <CsvUpload />
+    </div>
   );
 }
 
