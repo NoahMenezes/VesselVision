@@ -53,15 +53,15 @@ export function Dashboard() {
         <Onboarding />
         <div aria-live="polite" className="sr-only">
           {backend === "offline"
-            ? "Backend offline."
+            ? "Predictions offline."
             : backend === "online"
-              ? "Backend online."
-              : "Checking backend connection."}
+              ? "Predictions live."
+              : "Connecting to the prediction service."}
         </div>
         {backend === "offline" && (
           <div role="alert" className="border-b border-risk-high/20 bg-risk-high/[0.06] px-4 py-2 text-center text-xs">
-            Backend offline. Start it with <code>make backend</code> (uvicorn :8000).
-            The layout below is a preview; predictions need the API.
+            The prediction service is offline.
+            The layout below is a preview; predictions need it running.
           </div>
         )}
         <ProblemStrip />

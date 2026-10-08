@@ -25,7 +25,7 @@ export function CsvUpload() {
   const downloadTemplate = async () => {
     const schema = await getSchema();
     if (!schema) {
-      setError("Backend offline. Cannot build the CSV template.");
+      setError("Service offline. Cannot build the CSV template.");
       return;
     }
     const blob = new Blob([Object.keys(schema.features).join(",") + "\n"], { type: "text/csv" });
@@ -40,7 +40,7 @@ export function CsvUpload() {
   const handleFile = async (file: File) => {
     const schema = await getSchema();
     if (!schema) {
-      setError("Backend offline. Cannot validate the CSV.");
+      setError("Service offline. Cannot check the CSV.");
       return;
     }
     const known = new Set(Object.keys(schema.features));

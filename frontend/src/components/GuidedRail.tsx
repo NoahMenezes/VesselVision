@@ -146,7 +146,7 @@ export function GuidedRail() {
       {open && (
         <div className="px-4 pt-3">
           <Badge tone={backend === "online" ? "low" : backend === "offline" ? "high" : "neutral"}>
-            {backend === "online" ? "Backend online" : backend === "offline" ? "Backend offline" : "Checking backend"}
+            {backend === "online" ? "Predictions live" : backend === "offline" ? "Predictions offline" : "Connecting"}
           </Badge>
         </div>
       )}
@@ -174,10 +174,10 @@ export function GuidedRail() {
         <div className="mt-4 border-t border-border-soft px-4 pt-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">Pipeline</p>
           <div className="mt-2 space-y-1.5">
-            <Dot on={status.api} label="API online" />
-            <Dot on={status.schema} label="Dataset schema" />
-            <Dot on={status.models} label="Models trained" />
-            <Dot on={status.explain} label="Explainability" />
+            <Dot on={status.api} label="Service online" />
+            <Dot on={status.schema} label="Patient fields ready" />
+            <Dot on={status.models} label="Risk models ready" />
+            <Dot on={status.explain} label="Plain-word reasons" />
           </div>
           <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">Targets</p>
           {status.models ? (
@@ -211,7 +211,7 @@ export function GuidedRail() {
             >
               <FlaskConical className="h-3.5 w-3.5" aria-hidden /> GitHub
             </a>
-            <p className="py-1 text-muted">Demo video records pre-submission.</p>
+            <p className="py-1 text-muted">Demo video lands before submission.</p>
           </div>
         )}
         {open && (

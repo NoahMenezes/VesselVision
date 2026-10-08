@@ -25,7 +25,7 @@ export function usePrediction() {
       const ok = await getHealth();
       setBackend(ok ? "online" : "offline");
       if (!ok) {
-        setError("Backend offline. Start it with make backend (uvicorn :8000).");
+        setError("The prediction service is offline.");
         return;
       }
       const pred = await postPredict(vals);
@@ -38,7 +38,7 @@ export function usePrediction() {
       const expl = await postExplain(vals, selected);
       setExplanation(expl);
     } catch {
-      setError("Request failed. It will retry on your next edit.");
+      setError("Something went wrong. It will retry as you keep typing.");
     } finally {
       setLoading(false);
     }

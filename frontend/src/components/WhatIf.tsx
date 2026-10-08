@@ -36,7 +36,7 @@ export function WhatIf() {
     const pred = await postPredict({ ...inputs, [field]: tweaked });
     setBusy(false);
     if (!pred) {
-      setNote("What-if needs the trained models, which are not loaded yet.");
+      setNote("What-if starts working once the risk models finish loading.");
       setAfter(null);
       return;
     }

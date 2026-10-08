@@ -32,7 +32,7 @@ export function SummaryCard({ onSelect }: { onSelect: (t: SelectedTarget) => voi
             {Math.round(prediction.cad.probability * 100)}%
           </span>
           <span className="ml-2 text-xs text-foreground/60">
-            probability (threshold {Math.round(prediction.cad.threshold * 100)}%)
+            chance of disease (high over {Math.round(prediction.cad.threshold * 100)}%)
           </span>
           <span className="block text-[11px] text-foreground/50">
             {ANATOMY_MAP.LAD}, {ANATOMY_MAP.LCX} and RCA views update from the vessel cards below.

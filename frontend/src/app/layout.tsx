@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "VesselVision: CAD risk visualization",
   description:
-    "Predict CAD and LAD/LCX/RCA stenosis from clinical data, explore risk on an interactive 3D heart with SHAP explanations. Decision support only.",
+    "See heart-disease risk per artery on an interactive 3D heart, with plain-word reasons for every result. Decision support only.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

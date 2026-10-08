@@ -32,7 +32,7 @@ export function ShapPanel() {
       </h3>
       {rows.length === 0 ? (
         <p className="text-xs text-foreground/60">
-          Feature contributions appear here once explainability is live (Phase 6).
+          What pushed the result up or down appears here once reasons are ready.
           Click a vessel card or the 3D arteries to change the explained target.
         </p>
       ) : (
@@ -40,14 +40,14 @@ export function ShapPanel() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={rows} layout="vertical" margin={{ left: 8, right: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#24334d" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#D5DBE0" />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="label" width={110} tick={{ fontSize: 11 }} />
                 <Tooltip
-                  contentStyle={{ background: "#111c30", border: "1px solid #24334d", fontSize: 12 }}
+                  contentStyle={{ background: "#FFFFFF", border: "1px solid #D5DBE0", fontSize: 12 }}
                   formatter={(v, _name, p) => {
                     const r = p?.payload as { value: unknown; unit: string | null } | undefined;
-                    return [`${v} (value ${String(r?.value)}${r?.unit ? ` ${r.unit}` : ""})`, "SHAP"];
+                    return [`${v} (measured ${String(r?.value)}${r?.unit ? ` ${r.unit}` : ""})`, "Effect"];
                   }}
                 />
                 <ReferenceLine x={0} stroke="#e6edf3" />
