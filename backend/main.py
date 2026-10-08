@@ -39,6 +39,22 @@ async def add_process_time(request: Request, call_next):
     return response
 
 
+@app.get("/", include_in_schema=False)
+def root() -> dict[str, object]:
+    """Service landing (browsers hit / by default): status + where to go."""
+    from app.predict import _state
+
+    trained = _state.get("models") is not None
+    return {
+        "service": "VesselVision API",
+        "health": "/health",
+        "docs": "/docs",
+        "schema": "/schema",
+        "samples": "/samples",
+        "models_trained": trained,
+    }
+
+
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse()

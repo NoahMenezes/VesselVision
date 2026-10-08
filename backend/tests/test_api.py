@@ -58,6 +58,20 @@ def test_predict_503_until_trained():
     assert "train" in res.json()["detail"].lower()
 
 
+def test_predict_accepts_form_strings():
+    """Form-style strings must coerce (503 = passed validation, untrained)."""
+    body = _one_valid_input()
+    body["sex"] = "Male"
+    body["bbb"] = "LBBB"
+    body["vhd"] = "Moderate"
+    res = client.post("/predict", json={"inputs": body})
+    assert res.status_code == 503
+    bad = _one_valid_input()
+    bad["sex"] = "Unknown"
+    res = client.post("/predict", json={"inputs": bad})
+    assert res.status_code == 422
+
+
 def test_predict_rejects_leakage_keys_first():
     bad = _one_valid_input()
     bad["LAD"] = 1

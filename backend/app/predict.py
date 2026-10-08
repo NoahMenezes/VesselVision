@@ -59,9 +59,14 @@ def load_artifacts() -> dict[str, Any]:
         import json
 
         _state["thresholds"] = json.loads(thresholds_path.read_text())
-    df, _ = clean()
-    num = df.select_dtypes(include="number").median(numeric_only=True)
-    _state["medians"] = num.to_dict()
+    # Serving must never die on data problems: without medians the API still
+    # validates inputs, and prediction routes 503 via ensure_trained() first.
+    try:
+        df, _ = clean()
+        num = df.select_dtypes(include="number").median(numeric_only=True)
+        _state["medians"] = num.to_dict()
+    except Exception:
+        _state["medians"] = None
     _state["modes"] = {"bbb": "N"}
     return _state
 
@@ -74,16 +79,6 @@ def ensure_trained() -> dict[str, Any]:
 
 def _coerce_value(name: str, kind: str, value: Any) -> Any:
     """Coerce one raw input to its clean representation or raise ValueError."""
-    if kind == "sex" or name == "sex":
-        if isinstance(value, bool):
-            return int(value)
-        if isinstance(value, (int, float)) and value in (0, 1):
-            return int(value)
-        if isinstance(value, str) and value.strip().upper() in ("Y", "YES", "1"):
-            return 1
-        if isinstance(value, str) and value.strip().upper() in ("N", "NO", "0"):
-            return 0
-        raise ValueError(f"{name!r} must be 0/1 or Y/N, got {value!r}")
     if name == "sex":
         if value in (0, 1, False, True):
             return int(value)
@@ -93,6 +88,16 @@ def _coerce_value(name: str, kind: str, value: Any) -> Any:
         if s in ("female", "f", "fmale"):  # 'Fmale' typo exists in source data
             return 0
         raise ValueError(f"{name!r} must be Male/Female or 1/0, got {value!r}")
+    if kind == "binary":
+        if isinstance(value, bool):
+            return int(value)
+        if isinstance(value, (int, float)) and value in (0, 1):
+            return int(value)
+        if isinstance(value, str) and value.strip().upper() in ("Y", "YES", "1"):
+            return 1
+        if isinstance(value, str) and value.strip().upper() in ("N", "NO", "0"):
+            return 0
+        raise ValueError(f"{name!r} must be 0/1 or Y/N, got {value!r}")
     if kind == "bbb" or name == "bbb":
         s = str(value).strip()
         upper = {"N": "N", "LBBB": "LBBB", "RBBB": "RBBB"}
