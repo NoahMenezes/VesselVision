@@ -65,7 +65,7 @@ function Dot({ on, label }: { on: boolean | null; label: string }) {
 }
 
 export function GuidedRail() {
-  const { backend } = useStore();
+  const { backend, tab, setTab, setFlash } = useStore();
   const status = usePipelineStatus();
   const storedOpen = useSyncExternalStore(subscribeRail, getRailSnapshot, getRailServerSnapshot);
   const [override, setOverride] = useState<boolean | null>(null);
@@ -100,7 +100,29 @@ export function GuidedRail() {
   };
 
   const go = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Each tour stop visibly acts: mobile tab switches, the page scrolls,
+    // and the target section pulses so the navigation is unmistakable.
+    const tabFor: Record<string, "input" | "heart" | "results" | null> = {
+      problem: null,
+      "enter-data": "input",
+      "explore-heart": "heart",
+      "review-risk": "results",
+      performance: "results",
+    };
+    const flashFor: Record<string, string | null> = {
+      problem: null,
+      "enter-data": "enter-data",
+      "explore-heart": "explore-heart",
+      "review-risk": "review-risk",
+      performance: "review-risk",
+    };
+    const t = tabFor[id];
+    if (t && t !== tab) setTab(t);
+    setFlash(flashFor[id]);
+    window.setTimeout(() => setFlash(null), 1600);
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   return (
@@ -165,7 +187,7 @@ export function GuidedRail() {
               ))}
             </div>
           ) : (
-            <p className="mt-1 text-[11px] text-muted">Models train after the full CV run.</p>
+            <p className="mt-1 text-[11px] text-muted">Models appear here after training finishes.</p>
           )}
         </div>
       )}

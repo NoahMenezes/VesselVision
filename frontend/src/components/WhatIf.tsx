@@ -36,7 +36,7 @@ export function WhatIf() {
     const pred = await postPredict({ ...inputs, [field]: tweaked });
     setBusy(false);
     if (!pred) {
-      setNote("What-if needs trained models (see docs/PHASE4_REMAINING.md).");
+      setNote("What-if needs the trained models, which are not loaded yet.");
       setAfter(null);
       return;
     }

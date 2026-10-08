@@ -57,7 +57,7 @@ export function ResultsPanel() {
             <p className="font-medium text-foreground">No prediction yet.</p>
             <p className="mt-1">
               Fill the form or load an example patient, then press Predict.
-              Every number here will come from the API.
+              Every number here comes from the trained model.
             </p>
             {error ? <p className="mt-2 text-risk-moderate">{error}</p> : null}
           </div>
@@ -83,7 +83,9 @@ export function ResultsPanel() {
         </>
       )}
       <MeasurementsTable />
-      <PerformanceTab />
+      <div id="performance" className="scroll-mt-4">
+        <PerformanceTab />
+      </div>
     </div>
   );
 }

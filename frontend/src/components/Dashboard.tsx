@@ -2,7 +2,7 @@
 /** Main dashboard: guided rail + content. Health check on load, segmented
  *  section switch on mobile, anchor ids feed the rail scroll-spy.
  */
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { clsx } from "clsx";
 import { getHealth } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
@@ -39,8 +39,7 @@ export function ProblemStrip() {
 }
 
 export function Dashboard() {
-  const { backend, setBackend } = useStore();
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("input");
+  const { backend, setBackend, tab, setTab, flash } = useStore();
 
   useEffect(() => {
     getHealth().then((ok) => setBackend(ok ? "online" : "offline"));
@@ -86,13 +85,13 @@ export function Dashboard() {
           </div>
         </nav>
         <main id="main" className="grid flex-1 grid-cols-1 gap-4 p-3 lg:grid-cols-[320px_1fr_340px] lg:px-6">
-          <div id="enter-data" className={clsx("scroll-mt-4", tab === "input" ? "block" : "hidden", "lg:block")}>
+          <div id="enter-data" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "input" ? "block" : "hidden", "lg:block", flash === "enter-data" && "ring-2 ring-accent")}>
             <InputPanel />
           </div>
-          <div id="explore-heart" className={clsx("scroll-mt-4", tab === "heart" ? "block" : "hidden", "lg:block")}>
+          <div id="explore-heart" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "heart" ? "block" : "hidden", "lg:block", flash === "explore-heart" && "ring-2 ring-accent")}>
             <HeartPanel />
           </div>
-          <div id="review-risk" className={clsx("scroll-mt-4", tab === "results" ? "block" : "hidden", "lg:block")}>
+          <div id="review-risk" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "results" ? "block" : "hidden", "lg:block", flash === "review-risk" && "ring-2 ring-accent")}>
             <ResultsPanel />
           </div>
         </main>

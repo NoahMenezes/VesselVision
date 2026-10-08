@@ -57,7 +57,7 @@ export function CsvUpload() {
           (k) => !headers.map((h) => h.trim().toLowerCase()).includes(k),
         );
         if (missing.length > 0) {
-          errs.push(`${missing.length} schema fields absent. They will use training medians.`);
+          errs.push(`${missing.length} schema fields absent. They will use typical values.`);
         }
         const rows = (res.data as Record<string, string>[]).slice(0, 200);
         setParsed({ headers, rows, errors: errs, unknown });

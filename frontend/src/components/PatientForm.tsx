@@ -275,7 +275,7 @@ export function PatientForm() {
         </Button>
       </div>
       <p className="mt-2 text-[11px] text-foreground/50">
-        Auto-predicts ~400ms after you stop editing. Empty fields use training medians.
+        Fills in automatically about half a second after you stop typing. Empty fields use typical values.
       </p>
     </Card>
   );

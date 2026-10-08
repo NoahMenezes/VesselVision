@@ -30,7 +30,7 @@ export function usePrediction() {
       }
       const pred = await postPredict(vals);
       if (!pred) {
-        setError("Prediction unavailable. Models are not trained yet (see docs/PHASE4_REMAINING.md).");
+        setError("Prediction unavailable. The trained models are not loaded yet.");
         setPrediction(null);
         return;
       }

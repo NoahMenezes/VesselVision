@@ -61,7 +61,11 @@ export function MeasurementsTable() {
                 </td>
                 <td className="py-1 pr-2 text-foreground/50">{meta.normal ?? "—"}</td>
                 <td className="py-1 text-foreground/60">
-                  {flag ? "out of range" : shap !== undefined ? `SHAP ${shap >= 0 ? "+" : ""}${shap.toFixed(3)}` : "—"}
+                  {flag
+                    ? "out of range"
+                    : shap !== undefined
+                      ? `${shap >= 0 ? "raises" : "lowers"} risk (${shap >= 0 ? "+" : ""}${shap.toFixed(2)})`
+                      : "—"}
                 </td>
               </tr>
             );

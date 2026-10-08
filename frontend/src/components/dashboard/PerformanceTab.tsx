@@ -23,8 +23,9 @@ export function PerformanceTab() {
       </div>
       {metrics === null ? (
         <p className="text-xs text-foreground/60">
-          Held-out metrics (accuracy, precision, recall, F1, ROC-AUC per target)
-          appear here after Phase 5 evaluation. Expect wide intervals: n=303.
+          How accurate are the models? Real test scores for each artery appear
+          here after final evaluation. Small study (303 patients), so expect
+          wide ranges.
         </p>
       ) : (
         <pre className="tnum overflow-auto text-[11px]">{JSON.stringify(metrics, null, 2)}</pre>

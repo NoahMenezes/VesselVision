@@ -22,6 +22,10 @@ interface Store {
   setSelected: (v: SelectedTarget) => void;
   hoverVessel: VesselKey | null;
   setHoverVessel: (v: VesselKey | null) => void;
+  tab: "input" | "heart" | "results";
+  setTab: (v: "input" | "heart" | "results") => void;
+  flash: string | null;
+  setFlash: (v: string | null) => void;
   loading: boolean;
   setLoading: (v: boolean) => void;
   error: string | null;
@@ -38,6 +42,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [explanation, setExplanation] = useState<ExplainResponse | null>(null);
   const [selected, setSelected] = useState<SelectedTarget>("CAD");
   const [hoverVessel, setHoverVessel] = useState<VesselKey | null>(null);
+  const [tab, setTab] = useState<"input" | "heart" | "results">("input");
+  const [flash, setFlash] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [backend, setBackend] = useState<BackendStatus>("checking");
@@ -45,10 +51,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     () => ({
       inputs, setInputs, prediction, setPrediction, explanation,
       setExplanation, selected, setSelected, hoverVessel, setHoverVessel,
+      tab, setTab, flash, setFlash,
       loading, setLoading,
       error, setError, backend, setBackend,
     }),
-    [inputs, prediction, explanation, selected, hoverVessel, loading, error, backend],
+    [inputs, prediction, explanation, selected, hoverVessel, tab, flash, loading, error, backend],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
