@@ -2,19 +2,17 @@
 /** Separate LAD/LCX/RCA tube meshes (the GLB is one fused mesh and cannot be
  *  recolored per artery). Paths come from lib/arteries.ts.
  *
- *  Phase 11 behavior: color lerps toward riskColor(probability) from the
- *  store; with no prediction yet every artery stays neutral (never fake
- *  numbers). High-risk vessels pulse gently. Hover shows name + probability
- *  + level; click selects and the camera rig focuses the vessel.
+ *  No drei portals here by design: labels live in a DOM overlay positioned
+ *  by Projector (see ArteryLabels), because <Html> portals race React 19's
+ *  concurrent root management and crash the canvas.
  */
-import { useMemo, useRef, useState } from "react";
-import { Html } from "@react-three/drei";
+import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import {
-  ANATOMY_MAP,
   ARTERY_PATHS,
   VESSEL_NEUTRAL,
+  arteryLabelAnchor,
   riskColor,
   riskLevel,
 } from "@/lib/arteries";
@@ -42,23 +40,44 @@ function FocusRig({ points }: { points: Record<VesselKey, THREE.Vector3> }) {
   return null;
 }
 
-function Artery({ vessel, points, radius, labelOffset }: {
+/** Writes projected screen positions into the DOM overlay chips (no React
+ *  state per frame: direct DOM mutation through registered elements). */
+export function Projector() {
+  const { size, camera } = useThree();
+  const tmp = useMemo(() => new THREE.Vector3(), []);
+  useFrame(() => {
+    for (const a of ARTERY_PATHS) {
+      const el = labelEls.get(a.vessel);
+      if (!el) continue;
+      const anchor = arteryLabelAnchor(a.vessel);
+      tmp.set(anchor[0], anchor[1], anchor[2]).project(camera);
+      const behind = tmp.z > 1;
+      const x = (tmp.x * 0.5 + 0.5) * size.width;
+      const y = (-tmp.y * 0.5 + 0.5) * size.height;
+      el.style.opacity = behind ? "0" : "1";
+      el.style.visibility = "visible";
+      el.style.transform = `translate(-50%, -100%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+    }
+  });
+  return null;
+}
+
+/** DOM chip registry shared with the overlay (module scope, not state). */
+export const labelEls = new Map<VesselKey, HTMLElement>();
+
+function Artery({ vessel, points, radius }: {
   vessel: VesselKey;
   points: [number, number, number][];
   radius: number;
-  labelOffset: [number, number, number];
 }) {
-  const { selected, setSelected, prediction } = useStore();
-  const [hover, setHover] = useState(false);
+  const { selected, setSelected, prediction, hoverVessel, setHoverVessel } = useStore();
   const mat = useRef<THREE.MeshStandardMaterial>(null);
+  const hover = hoverVessel === vessel;
   const prob = prediction?.vessels[vessel]?.probability ?? null;
 
-  const { geometry, mid } = useMemo(() => {
+  const geometry = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3(points.map((p) => new THREE.Vector3(...p)));
-    return {
-      geometry: new THREE.TubeGeometry(curve, 48, radius, 10, false),
-      mid: new THREE.Vector3(...points[Math.floor(points.length / 2)]),
-    };
+    return new THREE.TubeGeometry(curve, 48, radius, 10, false);
   }, [points, radius]);
 
   const active = selected === vessel;
@@ -68,7 +87,6 @@ function Artery({ vessel, points, radius, labelOffset }: {
     if (!m) return;
     _target.copy(prob === null ? _neutral : new THREE.Color(riskColor(prob)));
     m.color.lerp(_target, 0.12);
-    // Gentle pulse on high-risk vessels only; neutral otherwise.
     const high = prob !== null && riskLevel(prob) === "high";
     m.emissive.set(high ? riskColor(prob) : active || hover ? "#2dd4bf" : "#000000");
     m.emissiveIntensity = high
@@ -77,45 +95,24 @@ function Artery({ vessel, points, radius, labelOffset }: {
   });
 
   return (
-    <group>
-      <mesh
-        geometry={geometry}
-        onClick={(e) => {
-          e.stopPropagation();
-          setSelected(active ? "CAD" : vessel);
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHover(true);
-          document.body.style.cursor = "pointer";
-        }}
-        onPointerOut={() => {
-          setHover(false);
-          document.body.style.cursor = "auto";
-        }}
-      >
-        <meshStandardMaterial ref={mat} color={VESSEL_NEUTRAL} roughness={0.35} />
-      </mesh>
-      <Html position={[mid.x + labelOffset[0], mid.y + labelOffset[1], mid.z + labelOffset[2]]} center>
-        <div className="flex flex-col items-center">
-          <button
-            type="button"
-            aria-label={`Select ${ANATOMY_MAP[vessel]}`}
-            aria-pressed={active}
-            onClick={() => setSelected(vessel)}
-            className="rounded-full border border-border bg-surface/90 px-2 py-0.5 text-[11px] font-medium"
-          >
-            {vessel}
-          </button>
-          {hover && (
-            <div className="tnum mt-1 whitespace-nowrap rounded-lg border border-border bg-surface px-2 py-1 text-[11px]">
-              {ANATOMY_MAP[vessel]}:{" "}
-              {prob === null ? "awaiting prediction" : `${Math.round(prob * 100)}% (${riskLevel(prob)} risk)`}
-            </div>
-          )}
-        </div>
-      </Html>
-    </group>
+    <mesh
+      geometry={geometry}
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelected(active ? "CAD" : vessel);
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHoverVessel(vessel);
+        document.body.style.cursor = "pointer";
+      }}
+      onPointerOut={() => {
+        setHoverVessel(null);
+        document.body.style.cursor = "auto";
+      }}
+    >
+      <meshStandardMaterial ref={mat} color={VESSEL_NEUTRAL} roughness={0.35} />
+    </mesh>
   );
 }
 
@@ -130,8 +127,9 @@ export function CoronaryTree() {
   return (
     <group>
       <FocusRig points={midpoints} />
+      <Projector />
       {ARTERY_PATHS.map((a) => (
-        <Artery key={a.vessel} {...a} />
+        <Artery key={a.vessel} vessel={a.vessel} points={a.points} radius={a.radius} />
       ))}
     </group>
   );

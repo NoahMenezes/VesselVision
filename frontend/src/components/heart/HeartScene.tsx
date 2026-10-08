@@ -10,6 +10,7 @@ import { OrbitControls } from "@react-three/drei";
 import { useStore } from "@/store/VesselVisionContext";
 import { CoronaryTree } from "./CoronaryTree";
 import { Myocardium } from "./Myocardium";
+import { ArteryLabels } from "./ArteryLabels";
 import { VesselLegend } from "./VesselLegend";
 
 const CAMERA_PRESETS: Record<"front" | "back", { pos: [number, number, number]; label: string }> = {
@@ -86,6 +87,7 @@ export function HeartScene() {
             target={[0, 0.1, 0]}
           />
         </Canvas>
+        <ArteryLabels />
         <VesselLegend />
       </div>
     </div>

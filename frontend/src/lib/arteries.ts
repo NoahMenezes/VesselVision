@@ -70,6 +70,18 @@ export const ARTERY_PATHS: ArteryPath[] = [
 /** Neutral vessel color before any prediction (teal-gray, not risk colors). */
 export const VESSEL_NEUTRAL = "#5b8a8a";
 
+/** Label anchor (midpoint + offset) for the DOM overlay. Pure math, no three.js. */
+export function arteryLabelAnchor(vessel: VesselKey): [number, number, number] {
+  const path = ARTERY_PATHS.find((a) => a.vessel === vessel);
+  if (!path) throw new Error(`Unknown vessel ${vessel}`);
+  const mid = path.points[Math.floor(path.points.length / 2)];
+  return [
+    mid[0] + path.labelOffset[0],
+    mid[1] + path.labelOffset[1],
+    mid[2] + path.labelOffset[2],
+  ];
+}
+
 /** Risk color scale (Phase 11 drives these from probabilities). */
 export function riskColor(probability: number): string {
   if (probability >= 0.7) return "#ef4444";
