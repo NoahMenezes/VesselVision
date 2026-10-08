@@ -1,7 +1,10 @@
 "use client";
 /** Semi-transparent myocardium from the open-license GLB (see
  *  public/models/CREDITS.md). All meshes share one transparent material so
- *  the coronary tubes stay visible. Missing file -> clear guidance error.
+ *  the coronary tubes stay visible.
+ *
+ *  Mounted ONLY after HeartModelGate confirms the file exists (HEAD check),
+ *  so a missing heart.glb shows guidance instead of a suspense-error crash.
  */
 import { useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
@@ -34,5 +37,3 @@ export function Myocardium() {
   }, [gltf, material]);
   return <primitive object={scene} scale={1.4} />;
 }
-
-useGLTF.preload(HEART_MODEL_URL);

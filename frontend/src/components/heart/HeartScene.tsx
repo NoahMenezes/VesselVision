@@ -3,13 +3,13 @@
  *  on first interaction, click-empty-space deselects. Light by design: no
  *  post-processing, pixel ratio capped, memoized geometries.
  */
-import { Component, Suspense, useRef, useState } from "react";
-import type { ElementRef, ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import type { ElementRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
 import { useStore } from "@/store/VesselVisionContext";
 import { CoronaryTree } from "./CoronaryTree";
-import { Myocardium } from "./Myocardium";
+import { HEART_MODEL_URL, Myocardium } from "./Myocardium";
 
 function Loader() {
   return (
@@ -21,24 +21,36 @@ function Loader() {
   );
 }
 
-class ModelErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
+/** HEAD-checks the GLB once; renders myocardium only when present, guidance
+ *  otherwise. No suspense-error path, so no unmount race when the file is
+ *  absent (the user downloads it per public/models/CREDITS.md). */
+function HeartModelGate() {
+  const [state, setState] = useState<"pending" | "ready" | "missing">("pending");
+  useEffect(() => {
+    let live = true;
+    fetch(HEART_MODEL_URL, { method: "HEAD" })
+      .then((res) => {
+        if (live) setState(res.ok ? "ready" : "missing");
+      })
+      .catch(() => {
+        if (live) setState("missing");
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (state === "pending") return <Loader />;
+  if (state === "missing") {
+    return (
+      <Html center>
+        <div className="max-w-60 rounded-xl border border-risk-moderate/40 bg-surface p-3 text-xs">
+          Heart model file is missing. Add <code>heart.glb</code> per{" "}
+          <code>public/models/CREDITS.md</code>. Arteries below still render.
+        </div>
+      </Html>
+    );
   }
-  render() {
-    if (this.state.failed) {
-      return (
-        <Html center>
-          <div className="max-w-60 rounded-xl border border-risk-moderate/40 bg-surface p-3 text-xs">
-            Heart model file is missing. Add <code>heart.glb</code> per{" "}
-            <code>public/models/CREDITS.md</code>. Arteries below still render.
-          </div>
-        </Html>
-      );
-    }
-    return this.props.children;
-  }
+  return <Myocardium />;
 }
 
 const CAMERA_PRESETS: Record<"front" | "back", { pos: [number, number, number]; label: string }> = {
@@ -97,9 +109,7 @@ export function HeartScene() {
           <directionalLight position={[3, 4, 5]} intensity={1.2} />
           <directionalLight position={[-3, 1, -2]} intensity={0.35} />
           <Suspense fallback={<Loader />}>
-            <ModelErrorBoundary>
-              <Myocardium />
-            </ModelErrorBoundary>
+            <HeartModelGate />
             <CoronaryTree />
           </Suspense>
           <OrbitControls

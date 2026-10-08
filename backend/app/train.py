@@ -26,7 +26,16 @@ Run:  uv run python -m app.train
 from __future__ import annotations
 
 import os
+import warnings
 from pathlib import Path
+
+# Known sklearn/imblearn interop noise under n_jobs=-1 (thread-config
+# propagation in joblib workers). Cosmetic only; no effect on CV scores.
+warnings.filterwarnings(
+    "ignore",
+    message=".*sklearn.utils.parallel.delayed.*",
+    category=UserWarning,
+)
 
 import numpy as np
 import pandas as pd
