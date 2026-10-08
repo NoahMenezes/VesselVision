@@ -2,10 +2,12 @@
 
 ## Current file
 
-`heart.glb` (14 KB, single mesh `Heart_Full`) — "Heart" by **Quaternius**,
-via poly.pizza (`/m/1yCRUwFnwX`), **CC0 public domain** (no attribution
-required; credited here anyway). Stylized low-poly myocardium shell; the
-LAD/LCX/RCA arteries are separate tube meshes (see `src/lib/arteries.ts`).
+`heart.glb` (3.07 MB, single mesh, ~20k verts, no animations) — Sketchfab
+user download ("human heart with annotations" variant).
+**PRE-SUBMISSION FIX REQUIRED: author name, model URL, and exact license
+(CC-BY / CC0 / other) must be confirmed from the Sketchfab page and written
+here. If the license is stricter than CC-BY, replace the file before 15 Oct.**
+Previous placeholder (CC0 Quaternius, 14 KB) remains in git history.
 
 ## Wanted upgrade (optional, drop-in)
 

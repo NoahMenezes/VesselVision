@@ -35,7 +35,7 @@ export function Myocardium() {
     });
     return clone;
   }, [gltf, material]);
-  return <primitive object={scene} scale={240} />;
-  // Raw GLB spans ~0.01 units; 240x lands it on the artery paths (~1.4 units).
-  // Recheck this constant whenever heart.glb is swapped (see CREDITS.md).
+  return <primitive object={scene} scale={0.08} />;
+  // Sketchfab annotated heart spans ~17.7 units tall; 0.08x lands it on the
+  // artery paths (~1.4 units). Recheck whenever heart.glb is swapped.
 }
