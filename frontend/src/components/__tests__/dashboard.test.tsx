@@ -32,14 +32,14 @@ describe("results empty state", () => {
 });
 
 describe("mobile section switch", () => {
-  test("verb tabs switch visible panels", () => {
+  test("tabs switch views", () => {
     shell(<Dashboard />);
     const tabs = within(screen.getByRole("navigation", { name: "Dashboard sections" }));
-    const heart = tabs.getByRole("button", { name: "Explore heart" });
+    const heart = tabs.getByRole("button", { name: "Heart" });
     fireEvent.click(heart);
     expect(heart.getAttribute("aria-pressed")).toBe("true");
     expect(
-      tabs.getByRole("button", { name: "Enter data" }).getAttribute("aria-pressed"),
+      tabs.getByRole("button", { name: "Data" }).getAttribute("aria-pressed"),
     ).toBe("false");
   });
 });

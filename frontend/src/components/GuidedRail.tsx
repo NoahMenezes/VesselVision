@@ -65,7 +65,7 @@ function Dot({ on, label }: { on: boolean | null; label: string }) {
 }
 
 export function GuidedRail() {
-  const { backend, tab, setTab, setFlash } = useStore();
+  const { backend, tab, setTab, setView, setFlash } = useStore();
   const status = usePipelineStatus();
   const storedOpen = useSyncExternalStore(subscribeRail, getRailSnapshot, getRailServerSnapshot);
   const [override, setOverride] = useState<boolean | null>(null);
@@ -100,28 +100,31 @@ export function GuidedRail() {
   };
 
   const go = (id: string) => {
-    // Each tour stop visibly acts: mobile tab switches, the page scrolls,
-    // and the target section pulses so the navigation is unmistakable.
-    const tabFor: Record<string, "input" | "heart" | "results" | null> = {
-      problem: null,
+    // Each tour stop opens its own page: the section fills the screen, so
+    // the navigation visibly acts even when nothing needs scrolling.
+    const viewFor: Record<string, "overview" | "input" | "heart" | "results" | "performance"> = {
+      problem: "overview",
       "enter-data": "input",
       "explore-heart": "heart",
       "review-risk": "results",
-      performance: "results",
+      performance: "performance",
     };
-    const flashFor: Record<string, string | null> = {
-      problem: null,
-      "enter-data": "enter-data",
-      "explore-heart": "explore-heart",
-      "review-risk": "review-risk",
-      performance: "review-risk",
+    const tabFor: Record<string, "input" | "heart" | "results" | "performance"> = {
+      problem: tab,
+      "enter-data": "input",
+      "explore-heart": "heart",
+      "review-risk": "results",
+      performance: "performance",
     };
-    const t = tabFor[id];
-    if (t && t !== tab) setTab(t);
-    setFlash(flashFor[id]);
-    window.setTimeout(() => setFlash(null), 1600);
+    setView(viewFor[id]);
+    setTab(tabFor[id]);
+    setFlash(null);
     requestAnimationFrame(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (id === "problem") {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     });
   };
 

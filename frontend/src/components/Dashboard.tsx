@@ -1,20 +1,23 @@
 "use client";
-/** Main dashboard: guided rail + content. Health check on load, segmented
- *  section switch on mobile, anchor ids feed the rail scroll-spy.
+/** Main dashboard: overview grid plus one focused page per tour stop.
+ *  The rail (desktop) and tabs (mobile) switch pages; every page holds one
+ *  part of the solution, nothing is clustered.
  */
 import { useEffect } from "react";
 import { clsx } from "clsx";
 import { getHealth } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
+import { PerformanceTab } from "./dashboard/PerformanceTab";
 import { Disclaimer } from "./Disclaimer";
 import { GuidedRail } from "./GuidedRail";
 import { HeartPanel, InputPanel, ResultsPanel } from "./panels";
 import { Onboarding } from "./Onboarding";
 
 const TABS = [
-  { id: "input", label: "Enter data" },
-  { id: "heart", label: "Explore heart" },
-  { id: "results", label: "Review risk" },
+  { id: "input", label: "Data" },
+  { id: "heart", label: "Heart" },
+  { id: "results", label: "Risk" },
+  { id: "performance", label: "Scores" },
 ] as const;
 
 export function ProblemStrip() {
@@ -39,7 +42,7 @@ export function ProblemStrip() {
 }
 
 export function Dashboard() {
-  const { backend, setBackend, tab, setTab, flash } = useStore();
+  const { backend, setBackend, tab, setTab, view, setView } = useStore();
 
   useEffect(() => {
     getHealth().then((ok) => setBackend(ok ? "online" : "offline"));
@@ -64,18 +67,25 @@ export function Dashboard() {
             The layout below is a preview; predictions need it running.
           </div>
         )}
-        <ProblemStrip />
-        {/* Mobile segmented section switch */}
+        {/* Mobile section switch */}
         <nav aria-label="Dashboard sections" className="p-3 lg:hidden">
-          <div role="group" className="grid grid-cols-3 rounded-lg bg-rail p-1">
+          <div role="group" className="grid grid-cols-4 rounded-lg bg-rail p-1">
             {TABS.map((t) => (
               <button
                 key={t.id}
                 type="button"
-                onClick={() => setTab(t.id)}
+                onClick={() => {
+                  // Tapping the active tab returns to the overview grid.
+                  if (tab === t.id && view !== "overview") {
+                    setView("overview");
+                  } else {
+                    setTab(t.id);
+                    setView(t.id);
+                  }
+                }}
                 aria-pressed={tab === t.id}
                 className={clsx(
-                  "rounded-md px-2 py-2 text-[13px] font-semibold transition-colors duration-200",
+                  "rounded-md px-1 py-2 text-[13px] font-semibold transition-colors duration-200",
                   tab === t.id ? "bg-surface text-foreground shadow-sm" : "text-muted",
                 )}
               >
@@ -84,18 +94,48 @@ export function Dashboard() {
             ))}
           </div>
         </nav>
-        <main id="main" className="grid flex-1 grid-cols-1 gap-4 p-3 lg:grid-cols-[320px_1fr_340px] lg:px-6">
-          <div id="enter-data" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "input" ? "block" : "hidden", "lg:block", flash === "enter-data" && "ring-2 ring-accent")}>
-            <InputPanel />
-          </div>
-          <div id="explore-heart" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "heart" ? "block" : "hidden", "lg:block", flash === "explore-heart" && "ring-2 ring-accent")}>
-            <HeartPanel />
-          </div>
-          <div id="review-risk" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "results" ? "block" : "hidden", "lg:block", flash === "review-risk" && "ring-2 ring-accent")}>
-            <ResultsPanel />
-          </div>
-        </main>
+        {view === "overview" ? (
+          <>
+            <ProblemStrip />
+            <PageGrid />
+          </>
+        ) : (
+          <FocusedPage />
+        )}
       </div>
     </div>
+  );
+}
+
+function PageGrid() {
+  const { tab, flash } = useStore();
+  return (
+    <main id="main" className="grid flex-1 grid-cols-1 gap-4 p-3 lg:grid-cols-[320px_1fr_340px] lg:px-6">
+      <div id="enter-data" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "input" ? "block" : "hidden", "lg:block", flash === "enter-data" && "ring-2 ring-accent")}>
+        <InputPanel />
+      </div>
+      <div id="explore-heart" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "heart" ? "block" : "hidden", "lg:block", flash === "explore-heart" && "ring-2 ring-accent")}>
+        <HeartPanel />
+      </div>
+      <div id="review-risk" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "results" ? "block" : "hidden", "lg:block", flash === "review-risk" && "ring-2 ring-accent")}>
+        <ResultsPanel />
+      </div>
+    </main>
+  );
+}
+
+function FocusedPage() {
+  const { view } = useStore();
+  return (
+    <main id="main" className="mx-auto w-full max-w-3xl flex-1 space-y-4 p-3 lg:px-6">
+      {view === "input" && <InputPanel />}
+      {view === "heart" && <HeartPanel />}
+      {view === "results" && <ResultsPanel />}
+      {view === "performance" && (
+        <div id="performance" className="scroll-mt-4">
+          <PerformanceTab />
+        </div>
+      )}
+    </main>
   );
 }

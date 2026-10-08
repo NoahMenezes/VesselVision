@@ -5,7 +5,6 @@ import { PatientForm } from "./PatientForm";
 import { WhatIf } from "./WhatIf";
 import { usePrediction } from "@/hooks/usePrediction";
 import { MeasurementsTable } from "./dashboard/MeasurementsTable";
-import { PerformanceTab } from "./dashboard/PerformanceTab";
 import { ShapPanel } from "./dashboard/ShapPanel";
 import { SummaryCard } from "./dashboard/SummaryCard";
 import { VesselCards } from "./dashboard/VesselCards";
@@ -83,9 +82,6 @@ export function ResultsPanel() {
         </>
       )}
       <MeasurementsTable />
-      <div id="performance" className="scroll-mt-4">
-        <PerformanceTab />
-      </div>
     </div>
   );
 }
