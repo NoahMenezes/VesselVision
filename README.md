@@ -62,6 +62,18 @@ make test      # backend pytest + frontend typecheck/lint
 
 Or see `Makefile` for the exact one-liners. Health: `GET http://localhost:8000/health`.
 
+## Deployment
+
+- Frontend: Vercel, with `NEXT_PUBLIC_API_URL` set to the backend origin.
+- Backend: Render / Hugging Face Spaces via `backend/Dockerfile`
+  (`docker build -f backend/Dockerfile -t vesselvision backend/`), mounting
+  `data/` and `backend/artifacts/` and setting `FRONTEND_URL` to the deployed
+  frontend origin for CORS. Expect cold starts on free tiers; the UI shows a
+  clear "backend offline" state until the API answers.
+- Reproducible installs: `backend/requirements.txt` (`uv export --no-hashes`).
+- Privacy: uploads are parsed in memory (2 MB cap, 200-row cap), never stored
+  or logged. Use only the public dataset or synthetic data.
+
 ## Dataset
 
 - Extension of the Z-Alizadeh Sani dataset (UCI / Kaggle), 303 patients, tabular.

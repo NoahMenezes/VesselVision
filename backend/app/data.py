@@ -25,8 +25,7 @@ from app.config import DATA_DIR, PROCESSED_DIR, TARGETS
 # UCI provenance (used only to document / re-fetch the raw file).
 UCI_ID = 411
 UCI_ZIP_URL = (
-    "https://archive.ics.uci.edu/static/public/411/"
-    "extention+of+z+alizadeh+sani+dataset.zip"
+    "https://archive.ics.uci.edu/static/public/411/extention+of+z+alizadeh+sani+dataset.zip"
 )
 RAW_XLSX_NAME = "extention of Z-Alizadeh sani dataset.xlsx"
 
@@ -163,9 +162,23 @@ def clean(df: pd.DataFrame | None = None) -> tuple[pd.DataFrame, dict]:
 
     # Y/N binaries.
     yn_cols = [
-        "obesity", "crf", "cva", "airway_disease", "thyroid_disease", "chf", "dlp",
-        "weak_peripheral_pulse", "lung_rales", "systolic_murmur", "diastolic_murmur",
-        "dyspnea", "atypical", "nonanginal", "lowth_ang", "lvh", "poor_r_progression",
+        "obesity",
+        "crf",
+        "cva",
+        "airway_disease",
+        "thyroid_disease",
+        "chf",
+        "dlp",
+        "weak_peripheral_pulse",
+        "lung_rales",
+        "systolic_murmur",
+        "diastolic_murmur",
+        "dyspnea",
+        "atypical",
+        "nonanginal",
+        "lowth_ang",
+        "lvh",
+        "poor_r_progression",
     ]
     for col in yn_cols:
         mapped = raw[col].map(BINARY_YN)
@@ -176,17 +189,46 @@ def clean(df: pd.DataFrame | None = None) -> tuple[pd.DataFrame, dict]:
 
     # Already-numeric 0/1 + small-int columns: coerce and validate.
     int_cols = [
-        "dm", "htn", "current_smoker", "ex_smoker", "fh", "edema",
-        "typical_chest_pain", "function_class", "q_wave", "st_elevation",
-        "st_depression", "tinversion", "region_rwma",
+        "dm",
+        "htn",
+        "current_smoker",
+        "ex_smoker",
+        "fh",
+        "edema",
+        "typical_chest_pain",
+        "function_class",
+        "q_wave",
+        "st_elevation",
+        "st_depression",
+        "tinversion",
+        "region_rwma",
     ]
     for col in int_cols:
         out[col] = pd.to_numeric(raw[col], errors="raise").astype("int64")
 
     # Continuous numerics.
     float_cols = [
-        "age", "weight", "length", "bmi", "bp", "pr", "fbs", "cr", "tg", "ldl",
-        "hdl", "bun", "esr", "hb", "k", "na", "wbc", "lymph", "neut", "plt", "ef_tte",
+        "age",
+        "weight",
+        "length",
+        "bmi",
+        "bp",
+        "pr",
+        "fbs",
+        "cr",
+        "tg",
+        "ldl",
+        "hdl",
+        "bun",
+        "esr",
+        "hb",
+        "k",
+        "na",
+        "wbc",
+        "lymph",
+        "neut",
+        "plt",
+        "ef_tte",
     ]
     for col in float_cols:
         out[col] = pd.to_numeric(raw[col], errors="raise").astype("float64")
@@ -199,18 +241,25 @@ def clean(df: pd.DataFrame | None = None) -> tuple[pd.DataFrame, dict]:
     # VHD ordinal: N=0, mild=1, Moderate=2, Severe=3.
     vhd = raw["vhd"].map(VHD_ORDER)
     if vhd.isna().any():
-        raise ValueError(f"Unexpected VHD levels: {sorted(raw.loc[vhd.isna(), 'vhd'].unique().tolist())}")
+        raise ValueError(
+            f"Unexpected VHD levels: {sorted(raw.loc[vhd.isna(), 'vhd'].unique().tolist())}"
+        )
     out["vhd"] = vhd.astype("int64")
 
     # Targets: vessels Stenotic=1; Cath CAD/Normal; CAD derived from Cath.
     for vessel in ("lad", "lcx", "rca"):
         mapped = raw[vessel].map({"Stenotic": 1, "Normal": 0})
         if mapped.isna().any():
-            raise ValueError(f"Unexpected {vessel} levels: {sorted(raw.loc[mapped.isna(), vessel].unique().tolist())}")
+            raise ValueError(
+                f"Unexpected {vessel} levels: "
+                f"{sorted(raw.loc[mapped.isna(), vessel].unique().tolist())}"
+            )
         out[vessel] = mapped.astype("int64")
     cath = raw["cath"].map({"CAD": 1, "Normal": 0})
     if cath.isna().any():
-        raise ValueError(f"Unexpected Cath levels: {sorted(raw.loc[cath.isna(), 'cath'].unique().tolist())}")
+        raise ValueError(
+            f"Unexpected Cath levels: {sorted(raw.loc[cath.isna(), 'cath'].unique().tolist())}"
+        )
     out["cath"] = cath.astype("int64")
     out["cad"] = out["cath"].astype("int64")  # overall CAD label == angiography result
 

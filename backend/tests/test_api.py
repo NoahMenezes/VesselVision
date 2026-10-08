@@ -45,8 +45,11 @@ def test_samples_have_no_labels():
 def _one_valid_input() -> dict:
     df, _ = clean()
     row = df.iloc[0]
-    return {c: (row[c].item() if hasattr(row[c], "item") else row[c])
-            for c in df.columns if c not in {"cad", "lad", "lcx", "rca", "cath"}}
+    return {
+        c: (row[c].item() if hasattr(row[c], "item") else row[c])
+        for c in df.columns
+        if c not in {"cad", "lad", "lcx", "rca", "cath"}
+    }
 
 
 def test_predict_503_until_trained():
@@ -105,4 +108,9 @@ def test_batch_row_limit_413():
     feats = [c for c in df.columns if c not in {"cad", "lad", "lcx", "rca", "cath"}]
     big = pd.DataFrame([{c: 0 for c in feats} for _ in range(201)])
     res = client.post("/predict-batch", files={"file": ("up.csv", _csv_bytes(big))})
+    assert res.status_code == 413
+
+
+def test_batch_byte_limit_413():
+    res = client.post("/predict-batch", files={"file": ("up.csv", b"a,b\n" + b"x," * 1_100_000)})
     assert res.status_code == 413

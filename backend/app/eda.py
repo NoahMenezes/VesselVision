@@ -22,8 +22,14 @@ def class_balance(df: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for target in ("cad", "lad", "lcx", "rca", "cath"):
         pos = int(df[target].sum())
-        rows.append({"target": target, "n_pos": pos, "n_neg": len(df) - pos,
-                     "pos_rate": round(pos / len(df), 3)})
+        rows.append(
+            {
+                "target": target,
+                "n_pos": pos,
+                "n_neg": len(df) - pos,
+                "pos_rate": round(pos / len(df), 3),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -37,8 +43,13 @@ def leakage_check(df: pd.DataFrame) -> pd.DataFrame:
     for col in ("cath", "lad", "lcx", "rca"):
         auc = roc_auc_score(df["cad"], df[col])
         p_cad_given_pos = df.loc[df[col] == 1, "cad"].mean()
-        rows.append({"feature": col, "single_feature_auc_vs_cad": round(auc, 3),
-                     "P(CAD | feature=1)": round(float(p_cad_given_pos), 3)})
+        rows.append(
+            {
+                "feature": col,
+                "single_feature_auc_vs_cad": round(auc, 3),
+                "P(CAD | feature=1)": round(float(p_cad_given_pos), 3),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -92,8 +103,11 @@ def save_figures(df: pd.DataFrame, fig_dir) -> list[str]:
     # 4. age + typical distributions by CAD status
     fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
     for i, col in enumerate(["age", "typical_chest_pain"]):
-        axes[i].hist([df.loc[df.cad == 0, col], df.loc[df.cad == 1, col]],
-                     label=["Normal", "CAD"], bins=15 if col == "age" else 2)
+        axes[i].hist(
+            [df.loc[df.cad == 0, col], df.loc[df.cad == 1, col]],
+            label=["Normal", "CAD"],
+            bins=15 if col == "age" else 2,
+        )
         axes[i].set_title(f"{col} by CAD status")
         axes[i].legend()
     p = fig_dir / "eda_distributions.png"
@@ -114,11 +128,14 @@ def main() -> None:
     print("shape:", df.shape)
     print("\ndtypes:\n", df.dtypes.value_counts().to_string())
     print("\nclass balance:\n", class_balance(df).to_string(index=False))
-    print("\nleakage check (single-feature AUC vs CAD):\n",
-          leakage_check(df).to_string(index=False))
-    print("\nNOTE: cath AUC = 1.0 because CAD is defined as (Cath == CAD); "
-          "vessel AUCs are high because CAD = any-vessel-stenotic. "
-          "This is exactly why LAD/LCX/RCA/Cath must never be features.")
+    print(
+        "\nleakage check (single-feature AUC vs CAD):\n", leakage_check(df).to_string(index=False)
+    )
+    print(
+        "\nNOTE: cath AUC = 1.0 because CAD is defined as (Cath == CAD); "
+        "vessel AUCs are high because CAD = any-vessel-stenotic. "
+        "This is exactly why LAD/LCX/RCA/Cath must never be features."
+    )
     for p in save_figures(df, fig_dir):
         print("wrote", p)
 

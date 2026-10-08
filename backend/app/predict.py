@@ -13,7 +13,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 import joblib
@@ -24,6 +23,7 @@ from app.data import VHD_ORDER, clean
 from app.features import get_feature_columns
 
 BATCH_ROW_LIMIT = 200
+MAX_UPLOAD_BYTES = 2_000_000  # ~10x a 200-row CSV; generous, blocks abuse
 FORBIDDEN_INPUTS = {"lad", "lcx", "rca", "cath", "cad"}
 
 
@@ -110,7 +110,7 @@ def _coerce_value(name: str, kind: str, value: Any) -> Any:
     try:
         return float(value)
     except (TypeError, ValueError):
-        raise ValueError(f"{name!r} must be numeric, got {value!r}")
+        raise ValueError(f"{name!r} must be numeric, got {value!r}") from None
 
 
 def validate_inputs(inputs: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
@@ -156,11 +156,13 @@ def predict_one(inputs: dict[str, Any]) -> dict[str, Any]:
     out: dict[str, Any] = {}
     vessels: dict[str, Any] = {}
     for target in TARGETS:
-        proba = float(state["models"][target].predict_proba(
-            _feature_row(inputs, target))[:, 1][0])
+        proba = float(state["models"][target].predict_proba(_feature_row(inputs, target))[:, 1][0])
         threshold = float(state["thresholds"].get(target, 0.5))
-        risk = {"probability": round(proba, 4), "label": int(proba >= threshold),
-                "threshold": threshold}
+        risk = {
+            "probability": round(proba, 4),
+            "label": int(proba >= threshold),
+            "threshold": threshold,
+        }
         if target == "CAD":
             out["cad"] = risk
         else:

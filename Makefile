@@ -13,3 +13,6 @@ train:  ## regenerate all artifacts + metrics + figures (Phases 4-5)
 test:  ## backend smoke tests + frontend typecheck/lint
 	cd backend && uv run pytest -q
 	cd frontend && bunx tsc --noEmit && bun run lint
+
+lint:  ## backend ruff check + format check
+	cd backend && uv run ruff check app main.py tests && uv run ruff format --check app main.py tests

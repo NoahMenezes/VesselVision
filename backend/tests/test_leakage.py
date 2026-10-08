@@ -4,8 +4,6 @@ Fails if LAD, LCX, RCA, Cath, or CAD leak into the features for ANY target,
 including via the fitted preprocessor's output names.
 """
 
-import pandas as pd
-
 from app.config import TARGETS
 from app.data import clean
 from app.features import build_preprocessor, get_feature_columns

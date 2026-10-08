@@ -67,14 +67,26 @@ def build_preprocessor(feature_columns: list[str]) -> ColumnTransformer:
     ordinal = [c for c in feature_columns if c in ORDINAL_COLUMNS]
     return ColumnTransformer(
         transformers=[
-            ("num", Pipeline([
-                ("impute", SimpleImputer(strategy="median")),
-                ("scale", StandardScaler()),
-            ]), numeric),
-            ("cat", Pipeline([
-                ("impute", SimpleImputer(strategy="most_frequent")),
-                ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
-            ]), categorical),
+            (
+                "num",
+                Pipeline(
+                    [
+                        ("impute", SimpleImputer(strategy="median")),
+                        ("scale", StandardScaler()),
+                    ]
+                ),
+                numeric,
+            ),
+            (
+                "cat",
+                Pipeline(
+                    [
+                        ("impute", SimpleImputer(strategy="most_frequent")),
+                        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
+                    ]
+                ),
+                categorical,
+            ),
             ("ord", SimpleImputer(strategy="median"), ordinal),
         ],
         verbose_feature_names_out=False,

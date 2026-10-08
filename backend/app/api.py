@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from app.config import TARGETS
 from app.predict import (
     BATCH_ROW_LIMIT,
+    MAX_UPLOAD_BYTES,
     TRAIN_GUIDANCE,
     ModelNotTrainedError,
     ensure_trained,
@@ -61,7 +62,7 @@ def create_prediction(body: PredictRequest) -> dict[str, Any]:
     try:
         return predict_one(coerced)
     except ModelNotTrainedError as exc:
-        raise HTTPException(status_code=503, detail=str(exc))
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/explain", response_model=ExplainResponse)
@@ -74,7 +75,7 @@ def create_explanation(body: ExplainRequest) -> dict[str, Any]:
     try:
         ensure_trained()
     except ModelNotTrainedError as exc:
-        raise HTTPException(status_code=503, detail=str(exc))
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     # SHAP explainers land in Phase 6; models alone are not enough.
     raise HTTPException(
         status_code=503,
@@ -84,11 +85,17 @@ def create_explanation(body: ExplainRequest) -> dict[str, Any]:
 
 @router.post("/predict-batch", response_model=list[BatchRowResult])
 def create_batch_predictions(file: UploadFile) -> list[dict[str, Any]]:
+    # Privacy: uploads are parsed in memory, never stored or logged.
     raw = file.file.read()
+    if len(raw) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=[f"Upload is {len(raw)} bytes; limit is {MAX_UPLOAD_BYTES}."],
+        ) from None
     try:
         frame = pd.read_csv(io.BytesIO(raw))
     except Exception:
-        raise HTTPException(status_code=422, detail=["Could not parse CSV upload."])
+        raise HTTPException(status_code=422, detail=["Could not parse CSV upload."]) from None
     if len(frame) == 0:
         raise HTTPException(status_code=422, detail=["CSV upload is empty."])
     if len(frame) > BATCH_ROW_LIMIT:
@@ -96,15 +103,17 @@ def create_batch_predictions(file: UploadFile) -> list[dict[str, Any]]:
             status_code=413,
             detail=[f"CSV has {len(frame)} rows; limit is {BATCH_ROW_LIMIT}."],
         )
-    unknown = [c for c in frame.columns
-               if str(c).strip().lower() not in _known_fields() | {"lad", "lcx", "rca", "cath", "cad"}]
+    unknown = [
+        c
+        for c in frame.columns
+        if str(c).strip().lower() not in _known_fields() | {"lad", "lcx", "rca", "cath", "cad"}
+    ]
     if unknown:
-        raise HTTPException(
-            status_code=422, detail=[f"Unknown columns: {sorted(set(unknown))}."])
+        raise HTTPException(status_code=422, detail=[f"Unknown columns: {sorted(set(unknown))}."])
     try:
         ensure_trained()
     except ModelNotTrainedError as exc:
-        raise HTTPException(status_code=503, detail=str(exc))
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     results: list[dict[str, Any]] = []
     for i, (_, record) in enumerate(frame.iterrows()):
         coerced, errors = validate_inputs({str(k): _cell(v) for k, v in record.items()})

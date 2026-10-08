@@ -43,11 +43,13 @@ def get_samples() -> list[dict[str, Any]]:
     for group_no, (desc, frame) in enumerate(picks, start=1):
         for i, (_, row) in enumerate(frame.iterrows(), start=1):
             inputs = {c: _to_jsonable(row[c]) for c in df.columns if c not in DROP_LABELS}
-            samples.append({
-                "id": f"sample-{group_no}-{i}",
-                "description": f"{desc} #{i}",
-                "inputs": inputs,
-            })
+            samples.append(
+                {
+                    "id": f"sample-{group_no}-{i}",
+                    "description": f"{desc} #{i}",
+                    "inputs": inputs,
+                }
+            )
     return samples
 
 
