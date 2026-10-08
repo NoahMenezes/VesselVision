@@ -60,15 +60,21 @@ make train     # full retrain -> artifacts + metrics + figures (Phase 4-5)
 make test      # backend pytest + frontend typecheck/lint
 ```
 
+Full training (~1h, run detached): `cd backend && N_JOBS=4 nohup uv run
+python -m app.train > /tmp/train_full.log 2>&1 &`. Done = 25 lines in
+`backend/artifacts/cv_results.csv`. `N_JOBS` caps worker processes (default
+4); unbounded parallelism thrashed a 12-core box to load 140+.
+
 Or see `Makefile` for the exact one-liners. Health: `GET http://localhost:8000/health`.
 
 ## Deployment
 
 - Frontend: Vercel, with `NEXT_PUBLIC_API_URL` set to the backend origin.
 - Backend: Render / Hugging Face Spaces via `backend/Dockerfile`
-  (`docker build -f backend/Dockerfile -t vesselvision backend/`), mounting
+  (`docker build -f backend/Dockerfile -t vesselvision-backend ./backend`), mounting
   `data/` and `backend/artifacts/` and setting `FRONTEND_URL` to the deployed
-  frontend origin for CORS. Expect cold starts on free tiers; the UI shows a
+  frontend origin for CORS. On SELinux hosts (Fedora/RHEL) add `:z` to both
+  `-v` mounts. Expect cold starts on free tiers; the UI shows a
   clear "backend offline" state until the API answers.
 - Reproducible installs: `backend/requirements.txt` (`uv export --no-hashes`).
 - Privacy: uploads are parsed in memory (2 MB cap, 200-row cap), never stored
