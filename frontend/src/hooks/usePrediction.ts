@@ -25,12 +25,12 @@ export function usePrediction() {
       const ok = await getHealth();
       setBackend(ok ? "online" : "offline");
       if (!ok) {
-        setError("Backend offline — start it with make backend (uvicorn :8000).");
+        setError("Backend offline. Start it with make backend (uvicorn :8000).");
         return;
       }
       const pred = await postPredict(vals);
       if (!pred) {
-        setError("Prediction unavailable — models are not trained yet (see docs/PHASE4_REMAINING.md).");
+        setError("Prediction unavailable. Models are not trained yet (see docs/PHASE4_REMAINING.md).");
         setPrediction(null);
         return;
       }
@@ -38,7 +38,7 @@ export function usePrediction() {
       const expl = await postExplain(vals, selected);
       setExplanation(expl);
     } catch {
-      setError("Request failed — retrying on your next edit.");
+      setError("Request failed. It will retry on your next edit.");
     } finally {
       setLoading(false);
     }

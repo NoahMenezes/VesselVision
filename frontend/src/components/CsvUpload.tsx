@@ -25,7 +25,7 @@ export function CsvUpload() {
   const downloadTemplate = async () => {
     const schema = await getSchema();
     if (!schema) {
-      setError("Backend offline — cannot build the CSV template.");
+      setError("Backend offline. Cannot build the CSV template.");
       return;
     }
     const blob = new Blob([Object.keys(schema.features).join(",") + "\n"], { type: "text/csv" });
@@ -40,7 +40,7 @@ export function CsvUpload() {
   const handleFile = async (file: File) => {
     const schema = await getSchema();
     if (!schema) {
-      setError("Backend offline — cannot validate the CSV.");
+      setError("Backend offline. Cannot validate the CSV.");
       return;
     }
     const known = new Set(Object.keys(schema.features));
@@ -57,7 +57,7 @@ export function CsvUpload() {
           (k) => !headers.map((h) => h.trim().toLowerCase()).includes(k),
         );
         if (missing.length > 0) {
-          errs.push(`${missing.length} schema fields absent — they will use training medians.`);
+          errs.push(`${missing.length} schema fields absent. They will use training medians.`);
         }
         const rows = (res.data as Record<string, string>[]).slice(0, 200);
         setParsed({ headers, rows, errors: errs, unknown });
@@ -122,7 +122,7 @@ export function CsvUpload() {
           {parsed.rows.length > 0 && (
             <>
               <p className="mb-1 text-foreground/60">
-                {parsed.rows.length} row(s) — click one to load it into the form:
+                {parsed.rows.length} rows. Click one to load it into the form:
               </p>
               <div className="max-h-40 overflow-auto rounded-xl border border-border">
                 <table className="w-full text-left text-[11px]">

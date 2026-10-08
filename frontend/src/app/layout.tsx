@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VesselVision — CAD risk visualization",
+  title: "VesselVision: CAD risk visualization",
   description:
     "Predict CAD and LAD/LCX/RCA stenosis from clinical data, explore risk on an interactive 3D heart with SHAP explanations. Decision support only.",
 };
@@ -24,7 +24,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <a href="#main" className="skip-link">
+          Skip to dashboard
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

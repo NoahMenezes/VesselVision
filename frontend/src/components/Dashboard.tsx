@@ -11,9 +11,9 @@ import { HeartPanel, InputPanel, ResultsPanel } from "./panels";
 import { Button } from "./ui";
 
 const TABS = [
-  { id: "input", label: "1. Input" },
-  { id: "heart", label: "2. Heart" },
-  { id: "results", label: "3. Results" },
+  { id: "input", label: "Enter data" },
+  { id: "heart", label: "Explore heart" },
+  { id: "results", label: "Review risk" },
 ] as const;
 
 export function Dashboard() {
@@ -30,7 +30,7 @@ export function Dashboard() {
       <Disclaimer />
       {backend === "offline" && (
         <div role="alert" className="border-b border-risk-high/40 bg-risk-high/10 px-4 py-2 text-center text-xs">
-          Backend offline — start it with <code>make backend</code> (uvicorn :8000).
+          Backend offline. Start it with <code>make backend</code> (uvicorn :8000).
           The layout below is a preview; predictions need the API.
         </div>
       )}
@@ -47,7 +47,7 @@ export function Dashboard() {
           </Button>
         ))}
       </nav>
-      <main className="grid flex-1 grid-cols-1 gap-3 p-3 lg:grid-cols-[320px_1fr_320px]">
+      <main id="main" className="grid flex-1 grid-cols-1 gap-3 p-3 lg:grid-cols-[320px_1fr_320px]">
         <div className={clsx(tab === "input" ? "block" : "hidden", "lg:block")}>
           <InputPanel />
         </div>

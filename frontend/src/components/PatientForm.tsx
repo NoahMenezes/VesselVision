@@ -97,7 +97,7 @@ function FieldRow({ name, field, value, onChange }: {
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(e.target.value)}
         >
-          <option value="">—</option>
+          <option value="">Select...</option>
           {BBB_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
         {hint}
@@ -113,7 +113,7 @@ function FieldRow({ name, field, value, onChange }: {
           value={value === undefined || value === "" ? "" : String(value)}
           onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
         >
-          <option value="">—</option>
+          <option value="">Select...</option>
           {VHD_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         {hint}
@@ -188,7 +188,7 @@ export function PatientForm() {
             }
           }}
         >
-          <option value="">— choose —</option>
+          <option value="">Select a patient...</option>
           {samples.map((s) => <option key={s.id} value={s.id}>{s.description}</option>)}
         </select>
       </label>
