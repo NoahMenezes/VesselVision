@@ -141,6 +141,7 @@ export function PatientForm() {
   const [schema, setSchema] = useState<FeatureSchema | null>(null);
   const [samples, setSamples] = useState<SamplePatient[]>([]);
   const [open, setOpen] = useState<Record<string, boolean>>({ demographic: true });
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     getSchema().then(setSchema);
@@ -167,6 +168,9 @@ export function PatientForm() {
 
   const names = Object.keys(schema.features);
   const filled = Object.keys(inputs).length;
+  const q = query.trim().toLowerCase();
+  const matches = (n: string) =>
+    q === "" || schema.features[n].label.toLowerCase().includes(q) || n.includes(q);
 
   return (
     <Card>
@@ -174,6 +178,17 @@ export function PatientForm() {
         <h2 className="font-medium">Patient input</h2>
         <Badge tone="neutral">{filled}/{names.length} fields</Badge>
       </div>
+
+      <label className="mb-2 block text-xs">
+        Find a field
+        <input
+          type="search"
+          placeholder="e.g. cholesterol, smoking, ECG…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm"
+        />
+      </label>
 
       <label className="mb-2 block text-xs">
         Load example patient
@@ -194,7 +209,7 @@ export function PatientForm() {
       </label>
 
       {GROUP_ORDER.map((group) => {
-        const fields = names.filter((n) => schema.features[n].group === group);
+        const fields = names.filter((n) => schema.features[n].group === group && matches(n));
         if (fields.length === 0) return null;
         const isOpen = open[group] ?? false;
         return (

@@ -72,3 +72,17 @@ summary:focus-visible,
 .skip-link:focus {
   left: 0;
 }
+
+@media print {
+  /* Report view: results only. */
+  nav,
+  header,
+  form,
+  [role="toolbar"] {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

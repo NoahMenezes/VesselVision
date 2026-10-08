@@ -8,6 +8,7 @@ import { getHealth } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
 import { Disclaimer, TopBar } from "./TopBar";
 import { HeartPanel, InputPanel, ResultsPanel } from "./panels";
+import { Onboarding } from "./Onboarding";
 import { Button } from "./ui";
 
 const TABS = [
@@ -28,6 +29,14 @@ export function Dashboard() {
     <div className="flex min-h-screen flex-col">
       <TopBar />
       <Disclaimer />
+      <Onboarding />
+      <div aria-live="polite" className="sr-only">
+        {backend === "offline"
+          ? "Backend offline."
+          : backend === "online"
+            ? "Backend online."
+            : "Checking backend connection."}
+      </div>
       {backend === "offline" && (
         <div role="alert" className="border-b border-risk-high/40 bg-risk-high/10 px-4 py-2 text-center text-xs">
           Backend offline. Start it with <code>make backend</code> (uvicorn :8000).

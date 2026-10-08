@@ -2,6 +2,8 @@
 import { Card } from "./ui";
 import { CsvUpload } from "./CsvUpload";
 import { PatientForm } from "./PatientForm";
+import { WhatIf } from "./WhatIf";
+import { usePrediction } from "@/hooks/usePrediction";
 import { MeasurementsTable } from "./dashboard/MeasurementsTable";
 import { PerformanceTab } from "./dashboard/PerformanceTab";
 import { ShapPanel } from "./dashboard/ShapPanel";
@@ -40,7 +42,8 @@ export function HeartPanel() {
 /** Phase 12: clinical dashboard. Each piece reads the store and degrades
  *  honestly pre-training (empty states, never fake numbers). */
 export function ResultsPanel() {
-  const { prediction, loading, error, setSelected } = useStore();
+  const { prediction, loading, error, inputs, setSelected } = useStore();
+  const { predictNow } = usePrediction();
   const showEmpty = !prediction && !loading;
   return (
     <div className="space-y-3">
@@ -60,10 +63,18 @@ export function ResultsPanel() {
         <>
           <SummaryCard onSelect={(t) => setSelected(t)} />
           <VesselCards />
+          <WhatIf />
           <ShapPanel />
           {error ? (
             <Card>
               <p className="text-xs text-risk-moderate">{error}</p>
+              <button
+                type="button"
+                onClick={() => void predictNow(inputs)}
+                className="mt-2 rounded-xl border border-border px-3 py-1 text-xs hover:bg-white/5"
+              >
+                Retry
+              </button>
             </Card>
           ) : null}
         </>
