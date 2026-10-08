@@ -3,6 +3,7 @@ import { Card, Skeleton } from "./ui";
 import { CsvUpload } from "./CsvUpload";
 import { PatientForm } from "./PatientForm";
 import { HeartCanvas } from "./heart/HeartCanvas";
+import { Schematic2D } from "./heart/VesselLegend";
 import { useStore } from "@/store/VesselVisionContext";
 
 /** Phase 9: schema-driven form + samples + CSV upload (live against /schema). */
@@ -26,6 +27,7 @@ export function HeartPanel() {
         stenosis probability; click a vessel to inspect it.
       </p>
       <HeartCanvas />
+      <Schematic2D />
     </Card>
   );
 }

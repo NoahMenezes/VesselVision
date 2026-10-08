@@ -10,6 +10,7 @@ import { Html, OrbitControls } from "@react-three/drei";
 import { useStore } from "@/store/VesselVisionContext";
 import { CoronaryTree } from "./CoronaryTree";
 import { HEART_MODEL_URL, Myocardium } from "./Myocardium";
+import { VesselLegend } from "./VesselLegend";
 
 function Loader() {
   return (
@@ -99,7 +100,7 @@ export function HeartScene() {
           Reset
         </button>
       </div>
-      <div className="h-105 w-full overflow-hidden rounded-xl border border-border">
+      <div className="relative h-105 w-full overflow-hidden rounded-xl border border-border">
         <Canvas
           dpr={[1, 1.5]}
           camera={{ position: [0, 0.2, 3.4], fov: 42 }}
@@ -124,6 +125,7 @@ export function HeartScene() {
             target={[0, 0.1, 0]}
           />
         </Canvas>
+        <VesselLegend />
       </div>
     </div>
   );
