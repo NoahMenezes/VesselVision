@@ -106,12 +106,24 @@ Or see `Makefile` for the exact one-liners. Health: `GET http://localhost:8000/h
   `arteries.ts` config) so predicted probabilities map exactly to colors.
 - Only public datasets and open-licensed 3D assets are used.
 
+## Screenshots
+
+> TODO (browser captures before submission):
+> `docs/screenshots/01-form.png` (filled form), `02-heart.png` (recolored
+> arteries), `03-shap.png` (explanation panel), `04-mobile.png` (guided tabs).
+
+## Built With
+
+FastAPI, scikit-learn, XGBoost, LightGBM, imbalanced-learn, SHAP, LIME,
+pandas, Next.js (App Router, TypeScript), React Three Fiber, drei, Recharts,
+Tailwind CSS, papaparse, axios, uv, bun.
+
 ## AI-assisted parts
 
 | Tool | Used for |
 | ---- | -------- |
 | OpenCode (Muse Spark) | Scaffolding, training pipeline, API, frontend, docs drafts |
-| Taste skills (`Leonxlnx/taste-skill`) | Frontend anti-slop rules (minimalist/calm clinical direction) |
+| Taste skills (`Leonxlnx/taste-skill`) | Frontend design rules (deep dark console direction, anti-slop bans) |
 | ChatGPT / similar (if used) | Copy review, demo script polish |
 
 All model metrics are real outputs of the training code; no results fabricated.
