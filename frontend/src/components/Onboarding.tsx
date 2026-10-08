@@ -1,30 +1,45 @@
 "use client";
 /** First-visit guidance overlay (dismissed forever via localStorage).
  *  Verb-led items, no step numbering, plain clinical language.
+ *
+ *  Visibility reads through useSyncExternalStore with a server snapshot of
+ *  `false`: server and first client render agree (null), so hydration never
+ *  mismatches. A hydration crash here once remounted the whole tree and took
+ *  the R3F canvas down with it; do not read localStorage during render.
  */
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Button, Card } from "./ui";
 
 const KEY = "vesselvision-onboarded-v1";
 
-function firstVisit(): boolean {
+function subscribe(onChange: () => void): () => void {
+  window.addEventListener("storage", onChange);
+  return () => window.removeEventListener("storage", onChange);
+}
+
+function getSnapshot(): boolean {
   try {
-    return typeof window !== "undefined" && !localStorage.getItem(KEY);
+    return localStorage.getItem(KEY) === null;
   } catch {
     return true;
   }
 }
 
+function getServerSnapshot(): boolean {
+  return false;
+}
+
 export function Onboarding() {
-  const [show, setShow] = useState(firstVisit);
-  if (!show) return null;
+  const firstVisit = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [dismissed, setDismissed] = useState(false);
+  if (dismissed || !firstVisit) return null;
   const dismiss = () => {
     try {
       localStorage.setItem(KEY, "1");
     } catch {
       /* private mode: overlay returns next visit, harmless */
     }
-    setShow(false);
+    setDismissed(true);
   };
   return (
     <div
