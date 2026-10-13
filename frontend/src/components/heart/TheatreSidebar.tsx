@@ -12,6 +12,69 @@ import { ANATOMY_MAP, riskColor } from "@/lib/arteries";
 import type { FeatureSchema, SamplePatient, SelectedTarget } from "@/lib/types";
 import { useStore } from "@/store/VesselVisionContext";
 import { usePrediction } from "@/hooks/usePrediction";
+import { flowParams } from "./LiveEffects";
+import { outOfRange } from "../dashboard/MeasurementsTable";
+
+/** Heart + blood numbers that visibly drive the living heart: pulse sets the
+ *  beat, the rest feed the risk model and flag here live as you edit. */
+const LIVE_NUMBERS = [
+  "pr", "bp", "ef_tte", "ldl", "hdl", "tg", "fbs",
+  "wbc", "neut", "lymph", "plt", "hb", "esr",
+];
+
+function LiveNumbers() {
+  const { inputs } = useStore();
+  const [schema, setSchema] = useState<FeatureSchema | null>(null);
+  useEffect(() => {
+    getSchema().then(setSchema);
+  }, []);
+  const rows = LIVE_NUMBERS.map((n) => ({
+    name: n,
+    label: schema?.features[n]?.label ?? n,
+    unit: schema?.features[n]?.unit ?? null,
+    normal: schema?.features[n]?.normal ?? null,
+    value: inputs[n],
+  })).filter((r) => r.value !== undefined);
+  if (rows.length === 0) return null;
+  const fp = flowParams(inputs);
+  return (
+    <div className="mt-4">
+      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/35">
+        Blood &amp; heart numbers — live
+      </p>
+      <p className="tnum mb-2 text-[11px] text-white/55">
+        Beat {fp.pr}/min · Flow ×{fp.speed.toFixed(1)} · {fp.wbcCells} white cells
+      </p>
+      <div className="overflow-hidden rounded-lg border border-white/10">
+        {rows.map((r, i) => {
+          const flag =
+            typeof r.value === "number" && r.normal ? outOfRange(r.normal, r.value) : null;
+          return (
+            <div
+              key={r.name}
+              className={`tnum flex items-center justify-between gap-2 px-2.5 py-1.5 text-[11px] ${
+                i > 0 ? "border-t border-white/[0.06]" : ""
+              }`}
+            >
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span
+                  aria-hidden
+                  className="h-1.5 w-1.5 shrink-0 rounded-full"
+                  style={{ background: flag === null ? "#3a4147" : flag ? "#f59e0b" : "#22c55e" }}
+                />
+                <span className="truncate text-white/75">{r.label}</span>
+              </span>
+              <span className="shrink-0 font-semibold text-white">
+                {String(r.value)}
+                {r.unit ? <span className="font-normal text-white/40"> {r.unit}</span> : null}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 /** Most influential routine-workup levers: always visible for tweaking. */
 const KEY_LEVERS = [
@@ -273,6 +336,7 @@ export function TheatreSidebar() {
           </div>
         ) : (
           <>
+            <LiveNumbers />
             <p className="mb-2 mt-4 text-[10px] font-semibold uppercase tracking-wider text-white/35">
               Key levers
             </p>
@@ -318,6 +382,11 @@ export function TheatreSidebar() {
             )}
             <p className="mt-3 text-[11px] leading-relaxed text-white/35">
               Edits re-score automatically — watch the heart recolor.
+            </p>
+            <p className="mt-2 border-t border-white/[0.06] pt-2 text-[11px] leading-relaxed text-white/35">
+              The model scores 3 arteries (LAD, LCX, RCA). Color and width show
+              risk per artery; red cells ride your pulse, white cells follow your
+              WBC, and low ejection weakens the beat — all illustrative.
             </p>
           </>
         )}

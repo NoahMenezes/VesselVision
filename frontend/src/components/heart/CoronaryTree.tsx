@@ -72,6 +72,7 @@ function Artery({ vessel, points, radius }: {
 }) {
   const { selected, setSelected, prediction, hoverVessel, setHoverVessel } = useStore();
   const mat = useRef<THREE.MeshStandardMaterial>(null);
+  const mesh = useRef<THREE.Mesh>(null);
   const hover = hoverVessel === vessel;
   const prob = prediction?.vessels[vessel]?.probability ?? null;
 
@@ -80,22 +81,34 @@ function Artery({ vessel, points, radius }: {
     return new THREE.TubeGeometry(curve, 48, radius, 10, false);
   }, [points, radius]);
 
+  // Narrowing anchor: the artery origin stays pinned while risk thins the
+  // tube (uniform scale ≈ cross-section; the origin offset hides the rest).
+  const origin = useMemo(() => new THREE.Vector3(...points[0]), [points]);
+
   const active = selected === vessel;
 
   useFrame(({ clock }) => {
     const m = mat.current;
     if (!m) return;
     _target.copy(prob === null ? _neutral : new THREE.Color(riskColor(prob)));
-    m.color.lerp(_target, 0.12);
+    m.color.lerp(_target, 0.2);
     const high = prob !== null && riskLevel(prob) === "high";
     m.emissive.set(high ? riskColor(prob) : active || hover ? "#2dd4bf" : "#000000");
     m.emissiveIntensity = high
       ? 0.45 + 0.25 * Math.sin(clock.elapsedTime * 3)
       : active || hover ? 0.6 : 0;
+    const meshObj = mesh.current;
+    if (meshObj) {
+      const goal = prob === null ? 1 : 1 - 0.32 * prob;
+      const s = meshObj.scale.x + (goal - meshObj.scale.x) * 0.1;
+      meshObj.scale.setScalar(s);
+      meshObj.position.set(origin.x * (1 - s), origin.y * (1 - s), origin.z * (1 - s));
+    }
   });
 
   return (
     <mesh
+      ref={mesh}
       geometry={geometry}
       onClick={(e) => {
         e.stopPropagation();

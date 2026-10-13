@@ -49,6 +49,9 @@ function Chip({ vessel }: { vessel: VesselKey }) {
           style={{ background: prob === null ? VESSEL_NEUTRAL : riskColor(prob) }}
         />
         {vessel}
+        {active && prob !== null && (
+          <span className="font-bold">{Math.round(prob * 100)}%</span>
+        )}
       </button>
       {hoverVessel === vessel && (
         <div className="tnum mt-1 whitespace-nowrap rounded-lg border border-border bg-white/95 px-2 py-1 text-[11px] shadow-md backdrop-blur">

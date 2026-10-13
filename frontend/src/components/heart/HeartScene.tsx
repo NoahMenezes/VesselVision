@@ -20,6 +20,8 @@ import { OrbitControls } from "@react-three/drei";
 import { useStore } from "@/store/VesselVisionContext";
 import { ANATOMY_MAP } from "@/lib/arteries";
 import { CoronaryTree } from "./CoronaryTree";
+import { BloodFlow, Heartbeat } from "./LiveEffects";
+import { DataLabels, DataProjector } from "./DataLabels";
 import { Myocardium } from "./Myocardium";
 import { ArteryLabels } from "./ArteryLabels";
 import { MiniMap, VesselLegend } from "./VesselLegend";
@@ -201,9 +203,13 @@ export function HeartScene() {
           mounting/unmounting any portal. HeartCanvas shows the DOM
           loader until Canvas mounts; arteries render immediately. */}
       <Suspense fallback={null}>
-        <Myocardium opacity={faded ? 0.08 : dark ? 0.5 : 0.45} />
+        <Heartbeat>
+          <Myocardium opacity={faded ? 0.08 : dark ? 0.5 : 0.45} />
+          <CoronaryTree />
+          {!faded && <BloodFlow />}
+        </Heartbeat>
       </Suspense>
-      <CoronaryTree />
+      <DataProjector />
       <OrbitControls
         ref={controls}
         makeDefault
@@ -249,7 +255,12 @@ export function HeartScene() {
       >
         {canvasTree(false)}
       </Canvas>
-      {showLabels && <ArteryLabels />}
+      {showLabels && (
+        <>
+          <ArteryLabels />
+          <DataLabels />
+        </>
+      )}
       <VesselLegend />
     </div>
   );
@@ -296,7 +307,12 @@ export function HeartScene() {
           >
             {canvasTree(true)}
           </Canvas>
-          {showLabels && <ArteryLabels />}
+          {showLabels && (
+            <>
+              <ArteryLabels />
+              <DataLabels />
+            </>
+          )}
         </div>
 
         {/* Vignette above the canvas, below the chrome. */}
@@ -320,8 +336,10 @@ export function HeartScene() {
                 ? "Overall view. Select an artery to focus it."
                 : `${selected} · ${ANATOMY_MAP[selected]}. Select empty space to clear.`}
             </p>
-            <p className="mt-1 text-[11px] text-white/35">
-              Drag to rotate · Scroll to zoom · Click a vessel to inspect
+            <p className="mt-1 max-w-sm text-[11px] leading-relaxed text-white/35">
+              Drag to rotate · Scroll to zoom · Click a vessel to inspect.
+              Beats at the patient&apos;s pulse rate; color + width show risk per
+              artery — schematic, not a scan.
             </p>
           </div>
           <div className="pointer-events-auto flex max-w-xl flex-wrap items-center justify-end gap-1.5">

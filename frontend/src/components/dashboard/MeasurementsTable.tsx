@@ -9,7 +9,9 @@ import type { FeatureSchema } from "@/lib/types";
 import { useStore } from "@/store/VesselVisionContext";
 import { Card } from "../ui";
 
-function outOfRange(hint: string | null, value: number): boolean {
+/** Shared range check: hints look like "< 120", ">= 55", "70-100". Exported
+ *  for the theatre sidebar's live blood-numbers strip. */
+export function outOfRange(hint: string | null, value: number): boolean {
   if (hint === null) return false;
   // Parse hints like "< 120", ">= 55", "70-100", "4500-11000".
   const lt = hint.match(/^<\s*([\d.]+)/);
