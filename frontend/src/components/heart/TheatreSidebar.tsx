@@ -237,6 +237,7 @@ export function TheatreSidebar() {
   usePrediction();
   const [schema, setSchema] = useState<FeatureSchema | null>(null);
   const [samples, setSamples] = useState<SamplePatient[] | null>(null);
+  const [query, setQuery] = useState("");
 
   const filled = Object.keys(inputs).length;
 
@@ -310,6 +311,29 @@ export function TheatreSidebar() {
         <div className="mt-3 shrink-0">
           <RiskReadout selected={selected} />
         </div>
+        <div className="relative mt-3 shrink-0">
+          <label htmlFor="theatre-search" className="sr-only">
+            Search values
+          </label>
+          <input
+            id="theatre-search"
+            type="search"
+            placeholder="Search values…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="block w-full rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 pr-8 text-xs text-white placeholder:text-white/30"
+          />
+          {query !== "" && (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => setQuery("")}
+              className="absolute bottom-1.5 right-2 text-sm text-white/40 hover:text-white"
+            >
+              ✕
+            </button>
+          )}
+        </div>
         <div className="mt-1 min-h-0 flex-1 overflow-y-auto pb-1">
 
         {filled === 0 ? (
@@ -337,28 +361,75 @@ export function TheatreSidebar() {
         ) : (
           <>
             <LiveNumbers />
-            <p className="mb-2 mt-4 text-[10px] font-semibold uppercase tracking-wider text-white/35">
-              Key levers
-            </p>
-            <div className="space-y-3">
-              {KEY_LEVERS.map((n) => (
-                <ValueRow
-                  key={n}
-                  name={n}
-                  label={labelOf(n)}
-                  unit={unitOf(n)}
-                  kind={kindOf(n)}
-                  value={inputs[n]}
-                  onChange={(v) => set(n, v)}
-                />
-              ))}
-            </div>
-            {groupedRest.length > 0 && (
-              <>
-                <p className="mb-2 mt-4 text-[10px] font-semibold uppercase tracking-wider text-white/35">
-                  All entered values
-                </p>
-                {groupedRest.map((group) => (
+            {(() => {
+              const q = query.trim().toLowerCase();
+              // Searching scans every dataset field (not just entered ones),
+              // entered values first, then alphabetically. Typing into an
+              // empty row adds that field to the patient.
+              if (q !== "") {
+                const pool = schema ? Object.keys(schema.features) : Object.keys(inputs);
+                const hits = pool
+                  .filter(
+                    (n) =>
+                      labelOf(n).toLowerCase().includes(q) || n.includes(q),
+                  )
+                  .sort(
+                    (a, b) =>
+                      (inputs[b] !== undefined ? 1 : 0) - (inputs[a] !== undefined ? 1 : 0) ||
+                      labelOf(a).localeCompare(labelOf(b)),
+                  );
+                if (hits.length === 0) {
+                  return (
+                    <p className="mt-4 text-center text-xs text-white/40">
+                      No values match “{query.trim()}”.
+                    </p>
+                  );
+                }
+                return (
+                  <>
+                    <p className="mb-2 mt-4 text-[10px] font-semibold uppercase tracking-wider text-white/35">
+                      Search results — {hits.length}
+                    </p>
+                    <div className="space-y-3">
+                      {hits.map((n) => (
+                        <ValueRow
+                          key={n}
+                          name={n}
+                          label={labelOf(n)}
+                          unit={unitOf(n)}
+                          kind={kindOf(n)}
+                          value={inputs[n]}
+                          onChange={(v) => set(n, v)}
+                        />
+                      ))}
+                    </div>
+                  </>
+                );
+              }
+              return (
+                <>
+                  <p className="mb-2 mt-4 text-[10px] font-semibold uppercase tracking-wider text-white/35">
+                    Key levers
+                  </p>
+                  <div className="space-y-3">
+                    {KEY_LEVERS.map((n) => (
+                      <ValueRow
+                        key={n}
+                        name={n}
+                        label={labelOf(n)}
+                        unit={unitOf(n)}
+                        kind={kindOf(n)}
+                        value={inputs[n]}
+                        onChange={(v) => set(n, v)}
+                      />
+                    ))}
+                  </div>
+                  {groupedRest.length > 0 && (
+                    <>
+                      <p className="mb-2 mt-4 text-[10px] font-semibold uppercase tracking-wider text-white/35">
+                        All entered values
+                      </p>
+                      {groupedRest.map((group) => (
                   <div key={group.key} className="mb-3">
                     <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/35">
                       {group.title}
@@ -377,9 +448,12 @@ export function TheatreSidebar() {
                       ))}
                     </div>
                   </div>
-                ))}
-              </>
-            )}
+                      ))}
+                    </>
+                  )}
+                </>
+              );
+            })()}
             <p className="mt-3 text-[11px] leading-relaxed text-white/35">
               Edits re-score automatically — watch the heart recolor.
             </p>

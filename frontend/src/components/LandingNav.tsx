@@ -10,6 +10,7 @@ import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import { HeartPulse } from "lucide-react";
 import { clerkConfigured } from "@/lib/auth";
 import { Button } from "@/components/ui";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function LandingNav() {
   const configured = clerkConfigured();
@@ -22,6 +23,7 @@ export function LandingNav() {
         <span className="hidden text-xs text-muted sm:inline">Heart risk checker</span>
       </Link>
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         {!configured ? (
           <span className="text-xs text-muted" title="Paste Clerk keys into frontend/.env.local to enable sign-in">
             Sign-in needs Clerk keys

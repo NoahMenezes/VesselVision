@@ -90,7 +90,7 @@ function Segmented({
             onClick={() => onPick(opt)}
             className={`flex-1 rounded-md px-3 py-1.5 text-[13px] font-semibold transition-colors ${
               active
-                ? "bg-foreground text-white shadow-sm"
+                ? "bg-foreground text-background shadow-sm"
                 : "text-muted hover:text-foreground"
             }`}
           >

@@ -44,7 +44,7 @@ export function Button({
         "font-semibold transition-all duration-200 disabled:opacity-50 active:scale-[0.98]",
         size === "md" ? "rounded px-4 py-2 text-sm" : "rounded px-2.5 py-1 text-xs",
         variant === "primary"
-          ? "bg-foreground text-white hover:opacity-90"
+          ? "bg-foreground text-background hover:opacity-90"
           : "border border-border bg-surface text-foreground hover:bg-surface-soft",
         className,
       )}

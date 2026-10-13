@@ -157,7 +157,7 @@ export function GuidedRail() {
               aria-current={isActive ? "true" : undefined}
               title={gated ? `${t.label}: unlocks after your first prediction` : `${t.label}: ${t.desc}`}
               className={clsx(
-                "flex items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors duration-200 hover:bg-black/[0.04]",
+                "flex items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors duration-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.07]",
                 !open && "justify-center",
                 gated && "opacity-40",
               )}

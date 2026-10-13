@@ -61,7 +61,7 @@ export function StepStrip() {
               aria-hidden
               className={
                 s.live
-                  ? "tnum flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white"
+                  ? "tnum flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background"
                   : "tnum flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-bold text-muted"
               }
             >
@@ -112,7 +112,7 @@ export function ResultsPanel() {
               <button
                 type="button"
                 onClick={() => void predictNow(inputs)}
-                className="mt-2 rounded border border-border px-3 py-1 text-xs hover:bg-black/[0.04]"
+                className="mt-2 rounded border border-border px-3 py-1 text-xs hover:bg-black/[0.04] dark:hover:bg-white/[0.07]"
               >
                 Retry
               </button>

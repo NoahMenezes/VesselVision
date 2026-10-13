@@ -25,6 +25,10 @@ export const metadata: Metadata = {
     "See heart-disease risk per artery on an interactive 3D heart, with plain-word reasons for every result. Decision support only.",
 };
 
+/** Pre-paint theme: stored choice wins, else OS preference. Runs before
+ *  first paint so the toggle never flashes the wrong theme. */
+const themeInit = `(function(){try{var t=localStorage.getItem("vesselvision-theme");if(!t){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.dataset.theme=t;}catch(e){}})();`;
+
 const configured =
   !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
   !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("placeholder");
@@ -35,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}
     >
+      <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       <body className="min-h-full flex flex-col">
         <a href="#main" className="skip-link">
           Skip to content

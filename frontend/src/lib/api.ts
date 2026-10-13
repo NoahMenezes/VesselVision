@@ -22,17 +22,27 @@ export async function getHealth(): Promise<boolean> {
   }
 }
 
+/** Success caches: every panel reads the same schema/samples without
+ *  refetching. Failures are never cached, so a late-starting backend is
+ *  picked up on the next call. */
+let schemaCache: FeatureSchema | undefined;
+let samplesCache: SamplePatient[] | undefined;
+
 export async function getSchema(): Promise<FeatureSchema | null> {
+  if (schemaCache !== undefined) return schemaCache;
   try {
-    return (await api.get("/schema")).data as FeatureSchema;
+    schemaCache = (await api.get("/schema")).data as FeatureSchema;
+    return schemaCache;
   } catch {
     return null;
   }
 }
 
 export async function getSamples(): Promise<SamplePatient[]> {
+  if (samplesCache !== undefined) return samplesCache;
   try {
-    return (await api.get("/samples")).data as SamplePatient[];
+    samplesCache = (await api.get("/samples")).data as SamplePatient[];
+    return samplesCache;
   } catch {
     return [];
   }

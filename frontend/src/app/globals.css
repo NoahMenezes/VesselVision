@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Class-driven dark mode: ThemeToggle sets data-theme on <html>, so the
+   whole app (landing + console) follows one switch and persists it. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* Light clinical editorial (Boardafolio-pattern tokens, original code).
  * Paper canvas, cool-paper rail, slate hairlines, one deep teal-green brand.
  * Risk trio is semantic state shared with the 3D heart: green -> amber -> red.
@@ -22,6 +26,27 @@
   --pill-green-bg: #d6fae3;
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
+  color-scheme: light;
+}
+
+/* Dark theme: same tokens, same accent family, lifted for dark surfaces.
+ * Component utilities read these vars at runtime, so every var-driven
+ * surface flips with zero per-component dark: classes. */
+[data-theme="dark"] {
+  --background: #0b0e10;
+  --rail: #10151a;
+  --foreground: #edf2f3;
+  --muted: #96a3ad;
+  --surface: #13181d;
+  --surface-soft: #1c232a;
+  --border: rgba(255, 255, 255, 0.14);
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --accent: #2fb98f;
+  --accent-strong: #5ee0b8;
+  --risk-low: #34c77b;
+  --risk-moderate: #e0a63f;
+  --risk-high: #e05656;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -58,6 +83,13 @@
 @media (prefers-reduced-motion: no-preference) {
   .stage-enter { animation: stage-in 0.45s ease-out both; }
   .stage-rise { animation: rise-in 0.6s cubic-bezier(0.32, 0.72, 0, 1) both; }
+  /* Value tick on the floating heart chips: pops whenever the number swaps
+     (the key changes, restarting the animation). Transform-only. */
+  .chip-pop { animation: chip-pop 0.38s cubic-bezier(0.32, 0.72, 0, 1) both; }
+}
+@keyframes chip-pop {
+  0% { transform: scale(1.4); }
+  100% { transform: scale(1); }
 }
 
 body {

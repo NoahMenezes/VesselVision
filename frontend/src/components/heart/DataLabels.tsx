@@ -76,7 +76,7 @@ function DataChip({ field, value }: { field: DataField; value: number | string }
     >
       <div className="tnum flex items-baseline gap-1.5 whitespace-nowrap rounded-full border border-white/15 bg-black/65 px-2.5 py-1 text-[11px] shadow-lg backdrop-blur-md">
         <span className="font-medium uppercase tracking-wide text-white/50">{field.short}</span>
-        <span className="font-bold text-white">
+        <span key={String(value)} className="chip-pop inline-block font-bold text-white">
           {field.format(value)}
           {field.unit ? <span className="font-normal text-white/45"> {field.unit}</span> : null}
         </span>

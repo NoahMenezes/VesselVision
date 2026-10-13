@@ -39,8 +39,8 @@ function Chip({ vessel }: { vessel: VesselKey }) {
         className={clsx(
           "tnum flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold tracking-wide shadow-md backdrop-blur transition-colors",
           active
-            ? "border-accent bg-foreground text-white"
-            : "border-border bg-white/90 text-foreground hover:border-foreground/40",
+            ? "border-accent bg-foreground text-background"
+            : "border-border bg-surface/90 text-foreground hover:border-foreground/40",
         )}
       >
         <span
@@ -50,11 +50,13 @@ function Chip({ vessel }: { vessel: VesselKey }) {
         />
         {vessel}
         {active && prob !== null && (
-          <span className="font-bold">{Math.round(prob * 100)}%</span>
+          <span key={Math.round(prob * 100)} className="chip-pop inline-block font-bold">
+            {Math.round(prob * 100)}%
+          </span>
         )}
       </button>
       {hoverVessel === vessel && (
-        <div className="tnum mt-1 whitespace-nowrap rounded-lg border border-border bg-white/95 px-2 py-1 text-[11px] shadow-md backdrop-blur">
+        <div className="tnum mt-1 whitespace-nowrap rounded-lg border border-border bg-surface/95 px-2 py-1 text-[11px] text-foreground shadow-md backdrop-blur">
           {ANATOMY_MAP[vessel]}:{" "}
           {prob === null ? "awaiting prediction" : `${Math.round(prob * 100)}% (${riskLevel(prob)} risk)`}
         </div>

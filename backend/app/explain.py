@@ -82,9 +82,7 @@ def _build_explainer(target: str) -> dict[str, Any]:
             explainer.shap_values(background[:2])
             method = "shap-tree"
         except NotImplementedError:
-            explainer = shap.TreeExplainer(
-                clf, feature_perturbation="tree_path_dependent"
-            )
+            explainer = shap.TreeExplainer(clf, feature_perturbation="tree_path_dependent")
             method = "shap-tree-path"
     elif est_name == "LogisticRegression":
         import shap

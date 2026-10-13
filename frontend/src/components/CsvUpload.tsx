@@ -153,7 +153,7 @@ export function CsvUpload() {
                         key={i}
                         tabIndex={0}
                         aria-label={`Load row ${i + 1} into the form`}
-                        className={`cursor-pointer ${loaded === i ? "bg-accent/10 font-semibold" : "hover:bg-black/[0.04]"}`}
+                        className={`cursor-pointer ${loaded === i ? "bg-accent/10 font-semibold" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.07]"}`}
                         onClick={() => loadRow(r, i)}
                         onKeyDown={(e) => { if (e.key === "Enter") loadRow(r, i); }}
                       >

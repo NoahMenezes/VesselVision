@@ -37,14 +37,14 @@ export function ShapPanel() {
         </p>
       ) : (
         <>
-          <div className="h-64">
+          <div className="h-64 text-foreground/70">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={rows} layout="vertical" margin={{ left: 8, right: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#D5DBE0" />
-                <XAxis type="number" tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="label" width={110} tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis type="number" tick={{ fontSize: 11, fill: "currentColor" }} />
+                <YAxis type="category" dataKey="label" width={110} tick={{ fontSize: 11, fill: "currentColor" }} />
                 <Tooltip
-                  contentStyle={{ background: "#FFFFFF", border: "1px solid #D5DBE0", fontSize: 12 }}
+                  contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", fontSize: 12, color: "var(--foreground)" }}
                   formatter={(v, _name, p) => {
                     const r = p?.payload as { value: unknown; unit: string | null } | undefined;
                     return [`${v} (measured ${String(r?.value)}${r?.unit ? ` ${r.unit}` : ""})`, "Effect"];

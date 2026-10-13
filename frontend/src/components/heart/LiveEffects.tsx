@@ -71,6 +71,11 @@ export function flowParams(inputs: Record<string, number | string>): FlowParams 
   };
 }
 
+/** Edit gulp: set to 1 whenever inputs change; FlowStreams drink it as a
+ *  temporary surge, then it decays. Module-local on purpose — one canvas
+ *  at a time ever reads it. */
+const editPulse = { v: 0 };
+
 export function Heartbeat({ children }: { children: React.ReactNode }) {
   const ref = useRef<THREE.Group>(null);
   const { inputs } = useStore();
@@ -147,7 +152,7 @@ function FlowStream({
 
   useFrame(({ clock }) => {
     const span = curve.getLength() || 1;
-    const rate = speed / span;
+    const rate = (speed * (1 + 0.9 * editPulse.v)) / span;
     for (let i = 0; i < offsets.length; i++) {
       const m = meshes.current[i];
       if (!m) continue;
@@ -318,6 +323,48 @@ function GreatVessels({ fp }: { fp: FlowParams }) {
   );
 }
 
+/** Sonar shell: whenever the scores actually change (not on every render),
+ *  one expanding wireframe shell blooms off the heart and dissolves. */
+function PredictionShockwave({ signature }: { signature: string | null }) {
+  const ref = useRef<THREE.Mesh>(null);
+  const start = useRef(-10);
+  const reduce = useMemo(() => prefersReducedMotion(), []);
+
+  useEffect(() => {
+    if (signature !== null) start.current = -1; // armed; clock stamped below
+  }, [signature]);
+
+  useFrame(({ clock }) => {
+    const m = ref.current;
+    if (!m) return;
+    if (start.current === -1) start.current = clock.elapsedTime;
+    const t = clock.elapsedTime - start.current;
+    if (t < 0 || t > 1.2) {
+      m.visible = false;
+      return;
+    }
+    m.visible = true;
+    const k = t / 1.2;
+    m.scale.setScalar(0.6 + 1.8 * k);
+    (m.material as THREE.MeshBasicMaterial).opacity = 0.45 * (1 - k);
+  });
+
+  if (reduce || signature === null) return null;
+  return (
+    <mesh ref={ref} visible={false}>
+      <sphereGeometry args={[1, 28, 28]} />
+      <meshBasicMaterial
+        color="#7dd3c8"
+        wireframe
+        transparent
+        opacity={0}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
 export function BloodFlow() {
   const { inputs, prediction } = useStore();
   const fp = flowParams(inputs);
@@ -326,6 +373,25 @@ export function BloodFlow() {
   // Calm green hearts drift; red hearts surge. Illustrative, not measured.
   const cad = prediction?.cad.probability ?? null;
   const energy = cad === null ? 0.8 : 0.65 + 0.7 * cad;
+  const signature = prediction
+    ? [
+        prediction.cad.probability,
+        prediction.vessels.LAD.probability,
+        prediction.vessels.LCX.probability,
+        prediction.vessels.RCA.probability,
+      ]
+        .map((p) => p.toFixed(3))
+        .join("|")
+    : null;
+
+  // Every edit gulps the streams; the surge decays in the frame loop.
+  useEffect(() => {
+    editPulse.v = 1;
+  }, [inputs]);
+  useFrame(() => {
+    editPulse.v *= 0.93;
+  });
+
   if (reduce) return null;
   return (
     <group>
@@ -346,6 +412,7 @@ export function BloodFlow() {
       })}
       <ChamberSwirl fp={fp} energy={energy} />
       <GreatVessels fp={fp} />
+      <PredictionShockwave signature={signature} />
     </group>
   );
 }

@@ -86,17 +86,26 @@ function Artery({ vessel, points, radius }: {
   const origin = useMemo(() => new THREE.Vector3(...points[0]), [points]);
 
   const active = selected === vessel;
+  const prevProb = useRef<number | null>(null);
+  const flash = useRef(0);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, delta) => {
     const m = mat.current;
     if (!m) return;
     _target.copy(prob === null ? _neutral : new THREE.Color(riskColor(prob)));
     m.color.lerp(_target, 0.2);
+    // Fresh score lands: brief white-hot flash, then settle.
+    if (prevProb.current !== prob) {
+      prevProb.current = prob;
+      if (prob !== null) flash.current = 1;
+    }
+    flash.current = Math.max(0, flash.current - delta * 1.4);
     const high = prob !== null && riskLevel(prob) === "high";
     m.emissive.set(high ? riskColor(prob) : active || hover ? "#2dd4bf" : "#000000");
-    m.emissiveIntensity = high
-      ? 0.45 + 0.25 * Math.sin(clock.elapsedTime * 3)
-      : active || hover ? 0.6 : 0;
+    if (flash.current > 0) m.emissive.set("#ffffff");
+    m.emissiveIntensity =
+      (high ? 0.45 + 0.25 * Math.sin(clock.elapsedTime * 3) : active || hover ? 0.6 : 0) +
+      flash.current * 1.1;
     const meshObj = mesh.current;
     if (meshObj) {
       const goal = prob === null ? 1 : 1 - 0.32 * prob;

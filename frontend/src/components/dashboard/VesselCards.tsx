@@ -28,7 +28,7 @@ export function VesselCards() {
               aria-pressed={selected === v}
               onClick={() => setSelected(selected === v ? "CAD" : v)}
               className={clsx(
-                "tnum w-full rounded-lg border border-border p-2 text-left text-xs hover:bg-black/[0.04]",
+                "tnum w-full rounded-lg border border-border p-2 text-left text-xs hover:bg-black/[0.04] dark:hover:bg-white/[0.07]",
                 selected === v ? "border-accent" : "border-border",
               )}
             >
