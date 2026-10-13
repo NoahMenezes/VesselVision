@@ -20,9 +20,10 @@ export function useUnlocked() {
   return prediction !== null || loading;
 }
 
-const TABS = [
-  { id: "input", label: "Data" },
-  { id: "heart", label: "Heart" },
+/** Mobile-only switcher: Patient and Heart already live in the overview
+ *  scroll below, so the switcher keeps just Risk and Scores as focused pages.
+ *  Desktop never renders this (lg:hidden) and keeps its rail + grid. */
+const MOBILE_TABS = [
   { id: "results", label: "Risk" },
   { id: "performance", label: "Scores" },
 ] as const;
@@ -75,11 +76,11 @@ export function Dashboard() {
             Not connected. The layout below is a preview — predictions need a connection.
           </div>
         )}
-        {/* Mobile section switch (Heart + Risk unlock after prediction) */}
+        {/* Mobile section switch (Risk unlocks after prediction) */}
         <nav aria-label="Dashboard sections" className="p-3 lg:hidden">
-          <div role="group" className="grid grid-cols-4 rounded-lg bg-rail p-1">
-            {TABS.map((t) => {
-              const gated = !unlocked && (t.id === "heart" || t.id === "results");
+          <div role="group" className="grid grid-cols-2 rounded-lg bg-rail p-1">
+            {MOBILE_TABS.map((t) => {
+              const gated = !unlocked && t.id === "results";
               return (
                 <button
                   key={t.id}
@@ -139,17 +140,26 @@ function PageGrid() {
   const unlocked = useUnlocked();
   if (!unlocked) return <StartPage />;
   return (
-    <main id="main" className="grid flex-1 grid-cols-1 gap-4 p-3 lg:grid-cols-[320px_1fr_340px] lg:px-6">
-      <div id="enter-data" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "input" ? "block" : "hidden", "lg:block", flash === "enter-data" && "ring-2 ring-accent")}>
+    <>
+      {/* Mobile: one guided scroll — patient, heart, results stacked. */}
+      <div className="mx-auto w-full max-w-2xl flex-1 space-y-5 p-3 lg:hidden">
         <InputPanel />
-      </div>
-      <div id="explore-heart" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "heart" ? "block" : "hidden", "lg:block", flash === "explore-heart" && "ring-2 ring-accent")}>
         <HeartPanel />
-      </div>
-      <div id="review-risk" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "results" ? "block" : "hidden", "lg:block", flash === "review-risk" && "ring-2 ring-accent")}>
         <ResultsPanel />
       </div>
-    </main>
+      {/* Desktop: three-column grid. Untouched by the mobile build. */}
+      <main id="main" className="hidden flex-1 gap-4 p-3 lg:grid lg:grid-cols-[320px_1fr_340px] lg:px-6">
+        <div id="enter-data" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "input" ? "block" : "hidden", "lg:block", flash === "enter-data" && "ring-2 ring-accent")}>
+          <InputPanel />
+        </div>
+        <div id="explore-heart" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "heart" ? "block" : "hidden", "lg:block", flash === "explore-heart" && "ring-2 ring-accent")}>
+          <HeartPanel />
+        </div>
+        <div id="review-risk" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "results" ? "block" : "hidden", "lg:block", flash === "review-risk" && "ring-2 ring-accent")}>
+          <ResultsPanel />
+        </div>
+      </main>
+    </>
   );
 }
 

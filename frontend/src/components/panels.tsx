@@ -27,15 +27,18 @@ export function InputPanel() {
  *  inside the expanded theatre view, not below the canvas. */
 export function HeartPanel() {
   return (
-    <Card className="flex min-h-80 flex-col">
-      <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 className="text-[15px] font-semibold tracking-tight">3D heart</h2>
-        <p className="shrink-0 text-xs text-muted">⤢ Expand for a better view</p>
-      </div>
-      <CanvasErrorBoundary>
-        <HeartCanvas />
-      </CanvasErrorBoundary>
-    </Card>
+    <div className="space-y-3">
+      <Card className="flex min-h-80 flex-col">
+        <div className="mb-3 flex items-baseline justify-between gap-2">
+          <h2 className="text-[15px] font-semibold tracking-tight">3D heart</h2>
+          <p className="shrink-0 text-xs text-muted">⤢ Expand for a better view</p>
+        </div>
+        <CanvasErrorBoundary>
+          <HeartCanvas />
+        </CanvasErrorBoundary>
+      </Card>
+      <MeasurementsTable />
+    </div>
   );
 }
 
@@ -120,7 +123,6 @@ export function ResultsPanel() {
           ) : null}
         </>
       )}
-      <MeasurementsTable />
     </div>
   );
 }

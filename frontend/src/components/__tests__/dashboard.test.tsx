@@ -35,13 +35,14 @@ describe("start state", () => {
 });
 
 describe("mobile section switch", () => {
-  test("heart and risk tabs stay locked before the first prediction", () => {
+  test("patient and heart live in the overview scroll; risk stays locked pre-prediction", () => {
     shell(<Dashboard />);
     const tabs = within(screen.getByRole("navigation", { name: "Dashboard sections" }));
-    expect((tabs.getByRole("button", { name: "Heart" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(tabs.queryByRole("button", { name: "Data" })).toBeNull();
+    expect(tabs.queryByRole("button", { name: "Heart" })).toBeNull();
     expect((tabs.getByRole("button", { name: "Risk" }) as HTMLButtonElement).disabled).toBe(true);
-    const data = tabs.getByRole("button", { name: "Data" });
-    fireEvent.click(data);
-    expect(data.getAttribute("aria-pressed")).toBe("true");
+    const scores = tabs.getByRole("button", { name: "Scores" });
+    fireEvent.click(scores);
+    expect(scores.getAttribute("aria-pressed")).toBe("true");
   });
 });
