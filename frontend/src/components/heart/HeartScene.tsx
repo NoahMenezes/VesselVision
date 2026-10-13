@@ -105,9 +105,9 @@ function StageControls({
       <ToolBtn dark onClick={() => onPreset("reset")} label="Reset camera">Reset</ToolBtn>
       <ToolBtn dark onClick={() => onZoom(0.8)} label="Zoom in">＋ Zoom</ToolBtn>
       <ToolBtn dark onClick={() => onZoom(1.25)} label="Zoom out">－ Zoom</ToolBtn>
-      <ToolBtn dark onClick={onSpin} label={spin ? "Pause rotation" : "Resume rotation"} active={spin}>
-        {spin ? "❚❚ Spin" : "▶ Spin"}
-      </ToolBtn>
+              <ToolBtn dark onClick={onSpin} label={spin ? "Pause rotation" : "Resume rotation"} active={spin}>
+                Spin
+              </ToolBtn>
       <ToolBtn dark onClick={onFade} label={faded ? "Show heart muscle" : "Fade heart muscle"} active={faded}>
         ◐ Muscle
       </ToolBtn>

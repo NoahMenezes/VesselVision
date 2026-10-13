@@ -145,7 +145,12 @@ export function GuidedRail() {
         )}
       </div>
 
-      <nav aria-label="Sections" className="mt-4 flex flex-col gap-1 px-2">
+      {open && (
+        <p className="px-4 pt-4 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">
+          Checkup steps
+        </p>
+      )}
+      <nav aria-label="Sections" className="mt-2 flex flex-col gap-1 px-2">
         {STEPS.map((t, i) => {
           const isActive = active === t.id;
           const gated = !unlocked && (t.id === "explore-heart" || t.id === "review-risk");
@@ -158,7 +163,7 @@ export function GuidedRail() {
               title={gated ? `${t.label}: unlocks after your first prediction` : `${t.label}: ${t.desc}`}
               className={clsx(
                 "flex items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors duration-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.07]",
-                !open && "justify-center",
+                !open && "flex-col justify-center gap-1",
                 gated && "opacity-40",
               )}
             >
@@ -168,7 +173,7 @@ export function GuidedRail() {
                     aria-hidden
                     className={clsx(
                       "tnum flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
-                      isActive ? "bg-foreground text-white" : "border border-border text-muted",
+                      isActive ? "bg-foreground text-background" : "border border-border text-muted",
                     )}
                   >
                     {i === 0 ? "•" : i}
@@ -181,10 +186,15 @@ export function GuidedRail() {
                   </span>
                 </>
               ) : (
-                <t.icon
-                  aria-hidden
-                  className={clsx("h-[18px] w-[18px] shrink-0", isActive ? "text-foreground" : "text-muted")}
-                />
+                <>
+                  <t.icon
+                    aria-hidden
+                    className={clsx("h-[18px] w-[18px] shrink-0", isActive ? "text-foreground" : "text-muted")}
+                  />
+                  <span className={clsx("text-[9px] font-semibold leading-none", isActive ? "text-foreground" : "text-muted")}>
+                    {t.label}
+                  </span>
+                </>
               )}
             </button>
           );
