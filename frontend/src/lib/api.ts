@@ -8,6 +8,7 @@ import type {
   FeatureSchema,
   PredictResponse,
   SamplePatient,
+  UncertaintyResponse,
 } from "./types";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -54,6 +55,18 @@ export async function postPredict(
 ): Promise<PredictResponse | null> {
   try {
     return (await api.post("/predict", { inputs })).data as PredictResponse;
+  } catch {
+    return null;
+  }
+}
+
+let uncertaintyCache: UncertaintyResponse | undefined;
+
+export async function getUncertainty(): Promise<UncertaintyResponse | null> {
+  if (uncertaintyCache !== undefined) return uncertaintyCache;
+  try {
+    uncertaintyCache = (await api.get("/uncertainty")).data as UncertaintyResponse;
+    return uncertaintyCache;
   } catch {
     return null;
   }

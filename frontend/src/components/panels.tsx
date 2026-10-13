@@ -6,6 +6,7 @@ import { WhatIf } from "./WhatIf";
 import { usePrediction } from "@/hooks/usePrediction";
 import { MeasurementsTable } from "./dashboard/MeasurementsTable";
 import { ShapPanel } from "./dashboard/ShapPanel";
+import { UncertaintyPanel } from "./dashboard/UncertaintyPanel";
 import { SummaryCard } from "./dashboard/SummaryCard";
 import { VesselCards } from "./dashboard/VesselCards";
 import { HeartCanvas } from "./heart/HeartCanvas";
@@ -109,6 +110,7 @@ export function ResultsPanel() {
           <VesselCards />
           <WhatIf />
           <ShapPanel />
+          <UncertaintyPanel />
           {error ? (
             <Card>
               <p className="text-xs text-risk-moderate">{error}</p>

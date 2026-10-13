@@ -187,3 +187,43 @@ def metrics_payload() -> dict[str, Any] | None:
     if not path.exists():
         return None
     return json.loads(path.read_text())
+
+
+CV_ROUNDS = 15  # stratified repeated 5-fold x 3 (seed 42); notebooks/02_training.ipynb
+
+
+def uncertainty_payload() -> dict[str, Any] | None:
+    """Per-target typical-variation bands from repeated cross-validation.
+
+    For each target the winning model (best mean ROC-AUC, the same rule
+    training uses) contributes its accuracy std across folds, reported in
+    percentage points. This is model-level variation — how much scores
+    wobble across validation rounds — not a per-patient error bar, and it
+    is labeled that way wherever it is shown.
+    """
+    import csv
+
+    path = ARTIFACTS_DIR / "cv_results.csv"
+    if not path.exists():
+        return None
+    best: dict[str, dict[str, float]] = {}
+    with path.open() as f:
+        for row in csv.DictReader(f):
+            target = row["target"]
+            auc = float(row["roc_auc_mean"])
+            if target not in best or auc > best[target]["roc_auc_mean"]:
+                best[target] = {
+                    "roc_auc_mean": auc,
+                    "accuracy_mean": float(row["accuracy_mean"]),
+                    "accuracy_std": float(row["accuracy_std"]),
+                }
+    out = {
+        t: {
+            "plusminus": max(0, round(info["accuracy_std"] * 100)),
+            "accuracy": round(info["accuracy_mean"] * 100, 1),
+            "rounds": CV_ROUNDS,
+        }
+        for t, info in best.items()
+        if t in TARGETS
+    }
+    return out or None

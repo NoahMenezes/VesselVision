@@ -58,4 +58,12 @@ export interface BatchRowResult {
   errors: string[];
 }
 
+export interface UncertaintyBand {
+  plusminus: number;
+  accuracy: number;
+  rounds: number;
+}
+
+export type UncertaintyResponse = Record<string, UncertaintyBand>;
+
 export type BackendStatus = "checking" | "online" | "offline";

@@ -20,6 +20,7 @@ from app.predict import (
     ensure_trained,
     metrics_payload,
     predict_one,
+    uncertainty_payload,
     validate_inputs,
 )
 from app.samples import get_samples
@@ -158,5 +159,16 @@ def read_metrics() -> dict[str, Any]:
         raise HTTPException(
             status_code=503,
             detail="No metrics yet. " + TRAIN_GUIDANCE,
+        )
+    return payload
+
+
+@router.get("/uncertainty")
+def read_uncertainty() -> dict[str, Any]:
+    payload = uncertainty_payload()
+    if payload is None:
+        raise HTTPException(
+            status_code=503,
+            detail="No validation results yet. " + TRAIN_GUIDANCE,
         )
     return payload

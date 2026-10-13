@@ -5,10 +5,9 @@ are built; unchecked items are future work. Nothing here blocks the demo.
 
 ## High value (moves the score)
 
-- [ ] **Uncertainty on every prediction** — show ± bands from the CV folds in
-  `backend/artifacts/cv_results.csv` next to each probability (dashboard cards
-  + theatre readout). A point estimate from n=303 overstates confidence.
-  _Weight: accuracy 30%._
+- [x] **Uncertainty on every prediction** — `GET /uncertainty` serves ± bands
+  from the CV folds in `backend/artifacts/cv_results.csv`; shown in the
+  results section, the theatre readout, and the printed report.
 - [ ] **Docs screenshots** — capture the four README placeholders:
   `docs/screenshots/01-form.png`, `02-heart.png`, `03-shap.png`, `04-mobile.png`.
 - [ ] **Demo video (5–7 min)** — follow `docs/demo_script.md` shot list; every
@@ -30,7 +29,7 @@ are built; unchecked items are future work. Nothing here blocks the demo.
 ## Out of scope for the hackathon
 
 - [ ] External validation cohort (single-center data; disclosed as limitation).
-- [ ] Multilingual summaries, accounts/history, clinician usability study.
+- [ ] Accounts/history, clinician usability study.
 
 ## Built (do not regress)
 
@@ -39,3 +38,4 @@ are built; unchecked items are future work. Nothing here blocks the demo.
 - [x] SHAP reasons, measurements, what-if (CAD), performance tab
 - [x] Form + examples + CSV upload (template + sample file)
 - [x] Printable patient report, dark/light mode, mobile stacked flow
+- [x] Report in English / Hindi / Spanish (print follows the selection)

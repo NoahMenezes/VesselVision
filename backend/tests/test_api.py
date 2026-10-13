@@ -127,6 +127,17 @@ def test_metrics_live(live):
     assert set(res.json()) == {"CAD", "LAD", "LCX", "RCA"}
 
 
+def test_uncertainty_live(live):
+    res = live.get("/uncertainty")
+    assert res.status_code == 200
+    body = res.json()
+    assert set(body) == {"CAD", "LAD", "LCX", "RCA"}
+    for band in body.values():
+        assert band["plusminus"] >= 0
+        assert 0 <= band["accuracy"] <= 100
+        assert band["rounds"] == 15
+
+
 def _csv_bytes(frame: pd.DataFrame) -> bytes:
     buf = io.BytesIO()
     frame.to_csv(buf, index=False)

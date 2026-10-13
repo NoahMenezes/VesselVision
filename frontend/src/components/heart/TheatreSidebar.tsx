@@ -7,7 +7,8 @@
  *  entered value follows below. With no patient loaded, one-click examples.
  */
 import { useEffect, useMemo, useState } from "react";
-import { getSamples, getSchema } from "@/lib/api";
+import { getSamples, getSchema, getUncertainty } from "@/lib/api";
+import type { UncertaintyResponse } from "@/lib/types";
 import { ANATOMY_MAP, riskColor } from "@/lib/arteries";
 import type { FeatureSchema, SamplePatient, SelectedTarget } from "@/lib/types";
 import { useStore } from "@/store/VesselVisionContext";
@@ -204,6 +205,10 @@ function ValueRow({
 
 function RiskReadout({ selected }: { selected: SelectedTarget }) {
   const { prediction } = useStore();
+  const [unc, setUnc] = useState<UncertaintyResponse | null>(null);
+  useEffect(() => {
+    getUncertainty().then(setUnc);
+  }, []);
   if (!prediction) {
     return <p className="text-[11px] text-white/40">No prediction yet — enter or load values.</p>;
   }
@@ -221,7 +226,12 @@ function RiskReadout({ selected }: { selected: SelectedTarget }) {
             <span aria-hidden className="inline-block h-2 w-2 rounded-full" style={{ background: riskColor(r.prob) }} />
             {r.code}
           </div>
-          <div className="text-base font-bold text-white">{Math.round(r.prob * 100)}%</div>
+          <div className="text-base font-bold text-white">
+            {Math.round(r.prob * 100)}%
+            {unc?.[r.code] != null && (
+              <span className="ml-1 text-[11px] font-semibold text-white/50">±{unc[r.code].plusminus}</span>
+            )}
+          </div>
           {r.code !== "CAD" && (
             <div className="truncate text-[10px] text-white/40">{ANATOMY_MAP[r.code as keyof typeof ANATOMY_MAP]}</div>
           )}
