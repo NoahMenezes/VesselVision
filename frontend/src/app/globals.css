@@ -49,6 +49,27 @@
   color-scheme: dark;
 }
 
+/* First visit (no stored choice, no attribute): follow the OS, in pure CSS.
+ * Media queries never touch SSR HTML, so this path cannot mismatch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --background: #0b0e10;
+    --rail: #10151a;
+    --foreground: #edf2f3;
+    --muted: #96a3ad;
+    --surface: #13181d;
+    --surface-soft: #1c232a;
+    --border: rgba(255, 255, 255, 0.14);
+    --border-soft: rgba(255, 255, 255, 0.08);
+    --accent: #2fb98f;
+    --accent-strong: #5ee0b8;
+    --risk-low: #34c77b;
+    --risk-moderate: #e0a63f;
+    --risk-high: #e05656;
+    color-scheme: dark;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-rail: var(--rail);
