@@ -5,7 +5,8 @@
  */
 import { useRef, useState } from "react";
 import Papa from "papaparse";
-import { getSchema } from "@/lib/api";
+import { getSchema, postBatch } from "@/lib/api";
+import type { BatchRowResult } from "@/lib/types";
 import { useStore } from "@/store/VesselVisionContext";
 import { usePrediction } from "@/hooks/usePrediction";
 import { Button } from "./ui";
@@ -22,6 +23,9 @@ export function CsvUpload() {
   const { predictNow } = usePrediction();
   const [parsed, setParsed] = useState<Parsed | null>(null);
   const [loaded, setLoaded] = useState<number | null>(null);
+  const [upload, setUpload] = useState<File | null>(null);
+  const [scores, setScores] = useState<BatchRowResult[] | null>(null);
+  const [scoring, setScoring] = useState(false);
   const [drag, setDrag] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -46,6 +50,8 @@ export function CsvUpload() {
       setError("Not connected. Try uploading the CSV again in a moment.");
       return;
     }
+    setUpload(file);
+    setScores(null);
     const known = new Set(Object.keys(schema.features));
     Papa.parse<Record<string, string>>(file, {
       header: true,
@@ -68,6 +74,19 @@ export function CsvUpload() {
       },
       error: (e) => setParsed({ headers: [], rows: [], errors: [e.message], unknown: [] }),
     });
+  };
+
+  const scoreAll = async () => {
+    if (!upload || scoring) return;
+    setScoring(true);
+    const res = await postBatch(upload);
+    setScoring(false);
+    if (!res) {
+      setError("Couldn't score the file. Try again in a moment.");
+      return;
+    }
+    setScores(res);
+    setError(null);
   };
 
   const loadRow = (row: Record<string, string>, index: number) => {
@@ -163,6 +182,36 @@ export function CsvUpload() {
                   </tbody>
                 </table>
               </div>
+              {scores && parsed && (
+                <ul className="mt-2 space-y-1">
+                  {scores.slice(0, 5).map((s) => (
+                    <li key={s.row}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const r = parsed.rows[s.row];
+                          if (r) loadRow(r, s.row);
+                        }}
+                        className="tnum flex w-full items-center justify-between gap-2 rounded-lg border border-border px-2.5 py-1.5 text-left text-[11px] hover:bg-black/[0.04] dark:hover:bg-white/[0.07]"
+                      >
+                        <span className="font-semibold">Row {s.row + 1}</span>
+                        {s.prediction ? (
+                          <span>
+                            <span className="font-bold">
+                              {Math.round(s.prediction.cad.probability * 100)}%
+                            </span>{" "}
+                            <span className="text-foreground/60">CAD</span>
+                          </span>
+                        ) : (
+                          <span className="text-risk-moderate">
+                            {s.errors[0] ?? "Couldn't score"}
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Button
                   size="sm"
@@ -174,9 +223,19 @@ export function CsvUpload() {
                 <Button
                   size="sm"
                   variant="ghost"
+                  onClick={() => void scoreAll()}
+                  disabled={scoring || !upload}
+                >
+                  {scoring ? "Scoring…" : "Score all"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
                   onClick={() => {
                     setParsed(null);
                     setLoaded(null);
+                    setUpload(null);
+                    setScores(null);
                     setInputs({});
                     setPrediction(null);
                     setExplanation(null);

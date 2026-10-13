@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
@@ -34,12 +35,16 @@ const configured =
   !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("placeholder");
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // suppressHydrationWarning below: the theme script sets data-theme
+  // pre-hydration, so the attribute legitimately differs from SSR HTML.
+  // This is the documented Next.js dark-mode pattern.
   const body = (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}
     >
-      <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeInit }} />
       <body className="min-h-full flex flex-col">
         <a href="#main" className="skip-link">
           Skip to content

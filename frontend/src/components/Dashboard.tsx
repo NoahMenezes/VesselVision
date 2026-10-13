@@ -67,7 +67,7 @@ export function Dashboard() {
       <GuidedRail />
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile-only top bar: brand, status, theme. Desktop uses the rail. */}
-        <div className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-border-soft bg-surface/90 px-4 py-2 backdrop-blur lg:hidden">
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-border-soft bg-surface/90 px-4 py-2 backdrop-blur print:hidden lg:hidden">
           <span className="flex items-center gap-1.5">
             <HeartPulse className="h-5 w-5 text-accent" aria-hidden />
             <span className="text-sm font-bold tracking-tight">VesselVision</span>

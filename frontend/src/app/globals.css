@@ -161,15 +161,35 @@ summary:focus-visible,
 }
 
 @media print {
-  /* Report view: results only. */
+  /* Report view: results only, on light paper even from dark mode. */
   nav,
   header,
   form,
+  aside,
   [role="toolbar"] {
     display: none !important;
+  }
+  [data-theme="dark"] {
+    --background: #ffffff;
+    --rail: #eff3f4;
+    --foreground: #121212;
+    --muted: #536471;
+    --surface: #ffffff;
+    --surface-soft: #f4f7f8;
+    --border: #d5dbe0;
+    --border-soft: rgba(82, 99, 112, 0.12);
+    --accent: #0e7c66;
   }
   body {
     background: #fff;
     color: #000;
+  }
+  /* Fixed tabular report: full width, rows never split across pages. */
+  .report-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .report-table tr {
+    break-inside: avoid;
   }
 }

@@ -3,6 +3,7 @@
  */
 import axios from "axios";
 import type {
+  BatchRowResult,
   ExplainResponse,
   FeatureSchema,
   PredictResponse,
@@ -53,6 +54,18 @@ export async function postPredict(
 ): Promise<PredictResponse | null> {
   try {
     return (await api.post("/predict", { inputs })).data as PredictResponse;
+  } catch {
+    return null;
+  }
+}
+
+/** Batch scoring: the raw file goes straight to POST /predict-batch
+ *  (parsed in memory server-side, never stored). Null on any failure. */
+export async function postBatch(file: File): Promise<BatchRowResult[] | null> {
+  try {
+    const form = new FormData();
+    form.append("file", file);
+    return (await api.post("/predict-batch", form)).data as BatchRowResult[];
   } catch {
     return null;
   }

@@ -52,4 +52,10 @@ export interface SamplePatient {
   inputs: Record<string, number | string>;
 }
 
+export interface BatchRowResult {
+  row: number;
+  prediction: PredictResponse | null;
+  errors: string[];
+}
+
 export type BackendStatus = "checking" | "online" | "offline";
