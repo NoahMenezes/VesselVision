@@ -12,6 +12,26 @@ from pathlib import Path
 # --- Paths ---
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = BACKEND_DIR.parent
+
+
+def _load_dotenv() -> None:
+    """Load backend/.env into the environment (no extra dependency).
+    Shell-exported variables always win; this only fills the gaps so
+    `bun run all` picks up DATABASE_URL with zero setup."""
+    env_file = BACKEND_DIR / ".env"
+    if not env_file.is_file():
+        return
+    for line in env_file.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key, value = key.strip(), value.strip().strip("'\"")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+_load_dotenv()
 DATA_DIR = Path(os.getenv("DATA_DIR", REPO_ROOT / "data"))
 ARTIFACTS_DIR = Path(os.getenv("ARTIFACTS_DIR", BACKEND_DIR / "artifacts"))
 PROCESSED_DIR = DATA_DIR / "processed"

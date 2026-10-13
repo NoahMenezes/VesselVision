@@ -11,6 +11,8 @@ from __future__ import annotations
 import os
 from typing import Any
 
+from app.config import BACKEND_DIR  # noqa: F401  (import runs the .env loader)
+
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS history (
   id SERIAL PRIMARY KEY,
@@ -65,13 +67,15 @@ async def ensure_history_table() -> None:
 
 
 async def save_record(label: str, inputs: dict[str, Any], pred: dict[str, Any]) -> int:
+    import json
+
     pool = await _pool_conn()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "INSERT INTO history (label, inputs, cad, lad, lcx, rca, cad_label)"
             " VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
             label[:80],
-            inputs,
+            json.dumps(inputs),
             float(pred["cad"]["probability"]),
             float(pred["vessels"]["LAD"]["probability"]),
             float(pred["vessels"]["LCX"]["probability"]),
@@ -94,12 +98,13 @@ async def list_records(limit: int = HISTORY_ROW_LIMIT) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for r in rows:
         raw_inputs = r["inputs"]
+        parsed = json.loads(raw_inputs) if isinstance(raw_inputs, str) else dict(raw_inputs)
         out.append(
             {
                 "id": int(r["id"]),
                 "created_at": r["created_at"].isoformat(),
                 "label": r["label"],
-                "inputs": json.loads(raw_inputs) if isinstance(raw_inputs, str) else dict(raw_inputs),
+                "inputs": parsed,
                 "cad": float(r["cad"]),
                 "lad": float(r["lad"]),
                 "lcx": float(r["lcx"]),
