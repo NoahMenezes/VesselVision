@@ -53,7 +53,8 @@ const STATUS = {
 } as const;
 
 export function GuidedRail() {
-  const { backend, tab, setTab, setView, setFlash } = useStore();
+  const { backend, tab, setTab, setView, setFlash, prediction, loading } = useStore();
+  const unlocked = prediction !== null || loading;
   const storedOpen = useSyncExternalStore(subscribeRail, getRailSnapshot, getRailServerSnapshot);
   const [override, setOverride] = useState<boolean | null>(null);
   const open = override ?? storedOpen;
@@ -147,16 +148,18 @@ export function GuidedRail() {
       <nav aria-label="Sections" className="mt-4 flex flex-col gap-1 px-2">
         {STEPS.map((t, i) => {
           const isActive = active === t.id;
+          const gated = !unlocked && (t.id === "explore-heart" || t.id === "review-risk");
           return (
             <button
               key={t.id}
               type="button"
               onClick={() => go(t.id)}
               aria-current={isActive ? "true" : undefined}
-              title={`${t.label}: ${t.desc}`}
+              title={gated ? `${t.label}: unlocks after your first prediction` : `${t.label}: ${t.desc}`}
               className={clsx(
                 "flex items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors duration-200 hover:bg-black/[0.04]",
                 !open && "justify-center",
+                gated && "opacity-40",
               )}
             >
               {open ? (

@@ -127,6 +127,14 @@ export function HeartScene() {
     () => typeof window === "undefined" || window.innerWidth >= 1024,
   );
   const closeRef = useRef<HTMLButtonElement>(null);
+  // Drags are not clicks: remember where the pointer went down so a rotate
+  // that ends over empty space doesn't deselect + refire a prediction.
+  const downPos = useRef<{ x: number; y: number } | null>(null);
+  const missedDeselect = (e: { clientX: number; clientY: number }) => {
+    const d = downPos.current;
+    if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6) return;
+    setSelected("CAD");
+  };
 
   // Theatre mode: lock scroll, focus close, Esc to exit.
   useEffect(() => {
@@ -228,11 +236,16 @@ export function HeartScene() {
   /** Inline (dashboard card) viewport: boxed. Theatre uses the full-bleed
       branch below instead — no boxes, no borders around the heart. */
   const viewport = () => (
-    <div className="relative h-105 w-full cursor-grab overflow-hidden rounded-xl border border-border shadow-sm active:cursor-grabbing">
+    <div
+      className="relative h-105 w-full cursor-grab overflow-hidden rounded-xl border border-border shadow-sm active:cursor-grabbing"
+      onPointerDown={(e) => {
+        downPos.current = { x: e.clientX, y: e.clientY };
+      }}
+    >
       <Canvas
         dpr={[1, 1.5]}
         camera={{ position: [0, 0.2, 3.4], fov: 42 }}
-        onPointerMissed={() => setSelected("CAD")}
+        onPointerMissed={missedDeselect}
       >
         {canvasTree(false)}
       </Canvas>
@@ -270,11 +283,16 @@ export function HeartScene() {
         />
 
         {/* The heart itself: edge to edge, no box, no border. */}
-        <div className="absolute inset-0 cursor-grab active:cursor-grabbing">
+        <div
+          className="absolute inset-0 cursor-grab active:cursor-grabbing"
+          onPointerDown={(e) => {
+            downPos.current = { x: e.clientX, y: e.clientY };
+          }}
+        >
           <Canvas
             dpr={[1, 1.5]}
             camera={{ position: [0, 0.2, 3.4], fov: 42 }}
-            onPointerMissed={() => setSelected("CAD")}
+            onPointerMissed={missedDeselect}
           >
             {canvasTree(true)}
           </Canvas>

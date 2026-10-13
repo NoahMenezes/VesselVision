@@ -35,13 +35,13 @@ export function Myocardium({ opacity = 0.45 }: { opacity?: number }) {
     // Auto-fit ANY heart.glb onto the artery rig: measure first, then scale
     // to ~1.9 units tall and center on the rig. Never trust a magic constant
     // (previous file spanned y 0..16.7 and floated out of frame entirely).
-    // NOTE: <primitive scale={s}> multiplies the position too, so the offset
-    // must be written in unscaled units or the heart drifts off-center.
+    // NOTE: object transform is position + scale * vertex, so the offset is
+    // written pre-scaled (-center * s) to land the middle exactly on target.
     const box = new THREE.Box3().setFromObject(clone);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     const s = size.y > 0 ? 1.9 / size.y : 1;
-    clone.position.set(-center.x, -center.y + 0.05 / s, -center.z);
+    clone.position.set(-center.x * s, -center.y * s + 0.05, -center.z * s);
     return { scene: clone, scale: s };
   }, [gltf, material]);
   return <primitive object={scene} scale={scale} />;

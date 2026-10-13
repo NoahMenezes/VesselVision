@@ -39,6 +39,47 @@ export function HeartPanel() {
   );
 }
 
+/** Start-of-flow strip: 1 → 2 → 3. Step 1 is live; steps 2 and 3 unlock
+ *  on the first prediction, when the full three-column view returns. */
+export function StepStrip() {
+  const steps = [
+    { n: 1, label: "Patient data", live: true },
+    { n: 2, label: "3D heart", live: false },
+    { n: 3, label: "Risk results", live: false },
+  ];
+  return (
+    <div>
+      <ol aria-label="Steps" className="flex items-center justify-center gap-2 sm:gap-3">
+        {steps.map((s, i) => (
+          <li key={s.n} className="flex items-center gap-2 sm:gap-3">
+            {i > 0 && (
+              <span aria-hidden className="text-sm font-bold text-border">
+                →
+              </span>
+            )}
+            <span
+              aria-hidden
+              className={
+                s.live
+                  ? "tnum flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-xs font-bold text-white"
+                  : "tnum flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-bold text-muted"
+              }
+            >
+              {s.n}
+            </span>
+            <span className={s.live ? "text-sm font-semibold text-foreground" : "text-sm text-muted"}>
+              {s.label}
+            </span>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-2 text-center text-xs text-muted">
+        Enter details or upload a CSV, then press Predict — steps 2 and 3 unlock.
+      </p>
+    </div>
+  );
+}
+
 /** Phase 12: clinical dashboard. Each piece reads the store and degrades
  *  honestly pre-training (empty states, never fake numbers). */
 export function ResultsPanel() {

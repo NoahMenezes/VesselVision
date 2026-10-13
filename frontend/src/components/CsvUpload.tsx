@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import Papa from "papaparse";
 import { getSchema } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
+import { usePrediction } from "@/hooks/usePrediction";
 import { Button } from "./ui";
 
 interface Parsed {
@@ -17,8 +18,10 @@ interface Parsed {
 }
 
 export function CsvUpload() {
-  const { setInputs, setError } = useStore();
+  const { inputs, setInputs, setPrediction, setExplanation, setError, loading, error } = useStore();
+  const { predictNow } = usePrediction();
   const [parsed, setParsed] = useState<Parsed | null>(null);
+  const [loaded, setLoaded] = useState<number | null>(null);
   const [drag, setDrag] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -61,21 +64,23 @@ export function CsvUpload() {
         }
         const rows = (res.data as Record<string, string>[]).slice(0, 200);
         setParsed({ headers, rows, errors: errs, unknown });
+        setLoaded(null);
       },
       error: (e) => setParsed({ headers: [], rows: [], errors: [e.message], unknown: [] }),
     });
   };
 
-  const loadRow = (row: Record<string, string>) => {
-    const inputs: Record<string, number | string> = {};
+  const loadRow = (row: Record<string, string>, index: number) => {
+    const next: Record<string, number | string> = {};
     for (const [k, v] of Object.entries(row)) {
       const key = k.trim().toLowerCase();
       if (v === "" || v == null) continue;
       const num = Number(v);
-      inputs[key] = Number.isNaN(num) ? v : num;
+      next[key] = Number.isNaN(num) ? v : num;
     }
-    setInputs(inputs);
+    setInputs(next);
     setError(null);
+    setLoaded(index);
   };
 
   return (
@@ -135,7 +140,7 @@ export function CsvUpload() {
           {parsed.rows.length > 0 && (
             <>
               <p className="mb-1 text-foreground/60">
-                {parsed.rows.length} rows. Click one to load it into the form:
+                {parsed.rows.length} rows. Click one to load it, then press Predict:
               </p>
               <div className="max-h-40 overflow-auto rounded-lg border border-border">
                 <table className="w-full text-left text-[11px]">
@@ -144,12 +149,50 @@ export function CsvUpload() {
                   </thead>
                   <tbody>
                     {parsed.rows.slice(0, 5).map((r, i) => (
-                      <tr key={i} className="cursor-pointer hover:bg-black/[0.04]" onClick={() => loadRow(r)}>
+                      <tr
+                        key={i}
+                        tabIndex={0}
+                        aria-label={`Load row ${i + 1} into the form`}
+                        className={`cursor-pointer ${loaded === i ? "bg-accent/10 font-semibold" : "hover:bg-black/[0.04]"}`}
+                        onClick={() => loadRow(r, i)}
+                        onKeyDown={(e) => { if (e.key === "Enter") loadRow(r, i); }}
+                      >
                         {parsed.headers.slice(0, 6).map((h) => <td key={h} className="px-2 py-1">{r[h]}</td>)}
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => void predictNow(inputs)}
+                  disabled={loading || loaded === null || Object.keys(inputs).length === 0}
+                >
+                  {loading ? "Scoring…" : loaded === null ? "Predict" : `Predict row ${loaded + 1}`}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setParsed(null);
+                    setLoaded(null);
+                    setInputs({});
+                    setPrediction(null);
+                    setExplanation(null);
+                    setError(null);
+                    if (fileRef.current) fileRef.current.value = "";
+                  }}
+                >
+                  Remove
+                </Button>
+                <p className="text-[11px] text-foreground/50">
+                  {error
+                    ? <span className="text-risk-moderate">{error}</span>
+                    : loaded === null
+                      ? "Pick a row above to enable Predict."
+                      : "Row loaded — results appear under Risk, colors on the Heart."}
+                </p>
               </div>
             </>
           )}

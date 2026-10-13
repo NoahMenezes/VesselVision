@@ -22,24 +22,26 @@ describe("clinical safety copy", () => {
   });
 });
 
-describe("results empty state", () => {
-  test("no prediction yet, no fabricated numbers", () => {
+describe("start state", () => {
+  test("step strip plus centered patient form, no fabricated numbers", () => {
     shell(<Dashboard />);
-    expect(screen.getByText("No prediction yet.")).toBeDefined();
+    expect(screen.getByText("Patient data")).toBeDefined();
+    expect(screen.getByText("3D heart")).toBeDefined();
+    expect(screen.getByText("Risk results")).toBeDefined();
+    expect(screen.getByText("Patient input")).toBeDefined();
     // No percent figures anywhere before a prediction exists.
     expect(document.body.textContent).not.toMatch(/\d+%/);
   });
 });
 
 describe("mobile section switch", () => {
-  test("tabs switch views", () => {
+  test("heart and risk tabs stay locked before the first prediction", () => {
     shell(<Dashboard />);
     const tabs = within(screen.getByRole("navigation", { name: "Dashboard sections" }));
-    const heart = tabs.getByRole("button", { name: "Heart" });
-    fireEvent.click(heart);
-    expect(heart.getAttribute("aria-pressed")).toBe("true");
-    expect(
-      tabs.getByRole("button", { name: "Data" }).getAttribute("aria-pressed"),
-    ).toBe("false");
+    expect((tabs.getByRole("button", { name: "Heart" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((tabs.getByRole("button", { name: "Risk" }) as HTMLButtonElement).disabled).toBe(true);
+    const data = tabs.getByRole("button", { name: "Data" });
+    fireEvent.click(data);
+    expect(data.getAttribute("aria-pressed")).toBe("true");
   });
 });

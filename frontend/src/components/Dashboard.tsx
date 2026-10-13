@@ -7,11 +7,18 @@ import { useEffect } from "react";
 import { clsx } from "clsx";
 import { getHealth } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
+import { PredictionDriver } from "@/hooks/usePrediction";
 import { PerformanceTab } from "./dashboard/PerformanceTab";
 import { Disclaimer } from "./Disclaimer";
 import { GuidedRail } from "./GuidedRail";
-import { HeartPanel, InputPanel, ResultsPanel } from "./panels";
+import { HeartPanel, InputPanel, ResultsPanel, StepStrip } from "./panels";
 import { Onboarding } from "./Onboarding";
+
+/** Gated flow: steps 2 (heart) and 3 (results) unlock on first prediction. */
+export function useUnlocked() {
+  const { prediction, loading } = useStore();
+  return prediction !== null || loading;
+}
 
 const TABS = [
   { id: "input", label: "Data" },
@@ -43,6 +50,7 @@ export function ProblemStrip() {
 
 export function Dashboard() {
   const { backend, setBackend, tab, setTab, view, setView } = useStore();
+  const unlocked = useUnlocked();
 
   useEffect(() => {
     getHealth().then((ok) => setBackend(ok ? "online" : "offline"));
@@ -50,6 +58,7 @@ export function Dashboard() {
 
   return (
     <div className="flex min-h-dvh">
+      <PredictionDriver />
       <GuidedRail />
       <div className="flex min-w-0 flex-1 flex-col">
         <Disclaimer />
@@ -66,31 +75,37 @@ export function Dashboard() {
             Not connected. The layout below is a preview — predictions need a connection.
           </div>
         )}
-        {/* Mobile section switch */}
+        {/* Mobile section switch (Heart + Risk unlock after prediction) */}
         <nav aria-label="Dashboard sections" className="p-3 lg:hidden">
           <div role="group" className="grid grid-cols-4 rounded-lg bg-rail p-1">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => {
-                  // Tapping the active tab returns to the overview grid.
-                  if (tab === t.id && view !== "overview") {
-                    setView("overview");
-                  } else {
-                    setTab(t.id);
-                    setView(t.id);
-                  }
-                }}
-                aria-pressed={tab === t.id}
-                className={clsx(
-                  "rounded-md px-1 py-2 text-[13px] font-semibold transition-colors duration-200",
-                  tab === t.id ? "bg-surface text-foreground shadow-sm" : "text-muted",
-                )}
-              >
-                {t.label}
-              </button>
-            ))}
+            {TABS.map((t) => {
+              const gated = !unlocked && (t.id === "heart" || t.id === "results");
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  disabled={gated}
+                  title={gated ? "Unlocks after your first prediction" : undefined}
+                  onClick={() => {
+                    // Tapping the active tab returns to the overview grid.
+                    if (tab === t.id && view !== "overview") {
+                      setView("overview");
+                    } else {
+                      setTab(t.id);
+                      setView(t.id);
+                    }
+                  }}
+                  aria-pressed={tab === t.id}
+                  className={clsx(
+                    "rounded-md px-1 py-2 text-[13px] font-semibold transition-colors duration-200",
+                    tab === t.id ? "bg-surface text-foreground shadow-sm" : "text-muted",
+                    gated && "opacity-40",
+                  )}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
         </nav>
         {view === "overview" ? (
@@ -106,8 +121,23 @@ export function Dashboard() {
   );
 }
 
+/** Start layout: step strip on top, patient data centered. The heart and
+ *  results return (three-column grid) once the first prediction lands. */
+function StartPage() {
+  return (
+    <main id="main" className="mx-auto w-full max-w-2xl flex-1 space-y-4 p-3 lg:px-6">
+      <StepStrip />
+      <div id="enter-data" className="scroll-mt-4">
+        <InputPanel />
+      </div>
+    </main>
+  );
+}
+
 function PageGrid() {
   const { tab, flash } = useStore();
+  const unlocked = useUnlocked();
+  if (!unlocked) return <StartPage />;
   return (
     <main id="main" className="grid flex-1 grid-cols-1 gap-4 p-3 lg:grid-cols-[320px_1fr_340px] lg:px-6">
       <div id="enter-data" className={clsx("scroll-mt-4 rounded-lg transition-shadow", tab === "input" ? "block" : "hidden", "lg:block", flash === "enter-data" && "ring-2 ring-accent")}>
@@ -125,6 +155,8 @@ function PageGrid() {
 
 function FocusedPage() {
   const { view } = useStore();
+  const unlocked = useUnlocked();
+  if (!unlocked) return <StartPage />;
   return (
     <main id="main" className="mx-auto w-full max-w-3xl flex-1 space-y-4 p-3 lg:px-6">
       {view === "input" && <InputPanel />}
