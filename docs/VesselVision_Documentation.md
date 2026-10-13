@@ -147,6 +147,7 @@ README (tools + which parts).
 
 ## 12. Future work
 
-External validation cohort, prospective silent-trial logging, uncertainty
-shown per prediction, multilingual discharge summaries, realistic-vessel
-fitting from the GLB surface, clinician usability study.
+Full prioritized list lives in `docs/ROADMAP.md` (high: per-prediction
+uncertainty, docs screenshots, demo video; medium: lab-photo auto-fill,
+report PDF button + patient header, per-artery what-if deltas; out of scope:
+external validation cohort, multilingual summaries, usability study).

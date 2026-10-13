@@ -42,8 +42,8 @@ Small clinical data punishes leakage hardest: Cath alone predicts CAD at AUC
 
 ## What's next
 
-External validation cohort, per-prediction uncertainty, prospective logging,
-clinician usability study.
+Per-prediction uncertainty, docs screenshots, demo video, lab-photo auto-fill,
+per-artery what-if. Full list in `docs/ROADMAP.md`.
 
 Built With: fastapi, scikit-learn, xgboost, lightgbm, shap, nextjs,
 react-three-fiber, recharts, tailwind.
