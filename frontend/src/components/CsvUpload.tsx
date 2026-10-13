@@ -25,7 +25,7 @@ export function CsvUpload() {
   const downloadTemplate = async () => {
     const schema = await getSchema();
     if (!schema) {
-      setError("Service offline. Cannot build the CSV template.");
+      setError("Not connected. Try downloading the template again in a moment.");
       return;
     }
     const blob = new Blob([Object.keys(schema.features).join(",") + "\n"], { type: "text/csv" });
@@ -40,7 +40,7 @@ export function CsvUpload() {
   const handleFile = async (file: File) => {
     const schema = await getSchema();
     if (!schema) {
-      setError("Service offline. Cannot check the CSV.");
+      setError("Not connected. Try uploading the CSV again in a moment.");
       return;
     }
     const known = new Set(Object.keys(schema.features));
@@ -84,9 +84,18 @@ export function CsvUpload() {
         CSV upload <span className="font-normal text-muted">— batch rows, optional</span>
       </summary>
       <div className="px-4 pb-4">
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between gap-2">
         <p className="text-xs text-muted">Drop a file, pick a row to load it.</p>
-        <Button size="sm" variant="ghost" onClick={() => void downloadTemplate()}>Template</Button>
+        <span className="flex shrink-0 gap-1.5">
+          <a
+            href="/sample-patients.csv"
+            download="sample-patients.csv"
+            className="rounded px-2.5 py-1 text-xs font-semibold border border-border bg-surface text-foreground hover:bg-surface-soft"
+          >
+            Sample file
+          </a>
+          <Button size="sm" variant="ghost" onClick={() => void downloadTemplate()}>Template</Button>
+        </span>
       </div>
       <div
         role="button"

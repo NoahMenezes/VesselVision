@@ -47,7 +47,7 @@ export function PerformanceTab() {
       {metrics === null ? (
         <Card>
           <p className="text-sm text-muted">
-            Scores appear here after final evaluation finishes.
+            Scores appear here once checking is finished.
           </p>
         </Card>
       ) : (

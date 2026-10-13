@@ -42,6 +42,22 @@
   --color-pill-green-bg: var(--pill-green-bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-grotesk), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Theatre stage entrance: fade + rise, transform/opacity only,
+   and only when the user has no reduced-motion preference. */
+@keyframes stage-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .stage-enter { animation: stage-in 0.45s ease-out both; }
+  .stage-rise { animation: rise-in 0.6s cubic-bezier(0.32, 0.72, 0, 1) both; }
 }
 
 body {

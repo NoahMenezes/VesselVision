@@ -19,7 +19,7 @@ export function LandingNav() {
       <Link href="/" className="flex items-center gap-2">
         <HeartPulse className="h-5 w-5 text-accent" aria-hidden />
         <span className="text-[15px] font-bold tracking-tight">VesselVision</span>
-        <span className="hidden text-xs text-muted sm:inline">Track A · CAD risk</span>
+        <span className="hidden text-xs text-muted sm:inline">Heart risk checker</span>
       </Link>
       <div className="flex items-center gap-2">
         {!configured ? (

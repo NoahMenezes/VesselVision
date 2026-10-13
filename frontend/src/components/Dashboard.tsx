@@ -56,15 +56,14 @@ export function Dashboard() {
         <Onboarding />
         <div aria-live="polite" className="sr-only">
           {backend === "offline"
-            ? "Predictions offline."
+            ? "Not connected."
             : backend === "online"
-              ? "Predictions live."
-              : "Connecting to the prediction service."}
+              ? "Ready."
+              : "Starting."}
         </div>
         {backend === "offline" && (
           <div role="alert" className="border-b border-risk-high/20 bg-risk-high/[0.06] px-4 py-2 text-center text-xs">
-            The prediction service is offline.
-            The layout below is a preview; predictions need it running.
+            Not connected. The layout below is a preview — predictions need a connection.
           </div>
         )}
         {/* Mobile section switch */}

@@ -4,7 +4,8 @@
  *  to tear down. Chips register themselves for per-frame positioning.
  */
 import { useEffect, useRef } from "react";
-import { ANATOMY_MAP, ARTERY_PATHS, riskLevel } from "@/lib/arteries";
+import { clsx } from "clsx";
+import { ANATOMY_MAP, ARTERY_PATHS, VESSEL_NEUTRAL, riskColor, riskLevel } from "@/lib/arteries";
 import type { VesselKey } from "@/lib/types";
 import { useStore } from "@/store/VesselVisionContext";
 import { labelEls } from "./CoronaryTree";
@@ -13,6 +14,7 @@ function Chip({ vessel }: { vessel: VesselKey }) {
   const { selected, setSelected, prediction, hoverVessel } = useStore();
   const ref = useRef<HTMLDivElement>(null);
   const prob = prediction?.vessels[vessel]?.probability ?? null;
+  const active = selected === vessel;
 
   useEffect(() => {
     const el = ref.current;
@@ -32,14 +34,24 @@ function Chip({ vessel }: { vessel: VesselKey }) {
       <button
         type="button"
         aria-label={`Select ${ANATOMY_MAP[vessel]}`}
-        aria-pressed={selected === vessel}
-        onClick={() => setSelected(selected === vessel ? "CAD" : vessel)}
-        className="rounded-full border border-border bg-surface/90 px-2 py-0.5 text-[11px] font-medium"
+        aria-pressed={active}
+        onClick={() => setSelected(active ? "CAD" : vessel)}
+        className={clsx(
+          "tnum flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold tracking-wide shadow-md backdrop-blur transition-colors",
+          active
+            ? "border-accent bg-foreground text-white"
+            : "border-border bg-white/90 text-foreground hover:border-foreground/40",
+        )}
       >
+        <span
+          aria-hidden
+          className="inline-block h-2 w-2 rounded-full"
+          style={{ background: prob === null ? VESSEL_NEUTRAL : riskColor(prob) }}
+        />
         {vessel}
       </button>
       {hoverVessel === vessel && (
-        <div className="tnum mt-1 whitespace-nowrap rounded-lg border border-border bg-surface px-2 py-1 text-[11px]">
+        <div className="tnum mt-1 whitespace-nowrap rounded-lg border border-border bg-white/95 px-2 py-1 text-[11px] shadow-md backdrop-blur">
           {ANATOMY_MAP[vessel]}:{" "}
           {prob === null ? "awaiting prediction" : `${Math.round(prob * 100)}% (${riskLevel(prob)} risk)`}
         </div>

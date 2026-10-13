@@ -49,8 +49,7 @@ export function HeartCanvas() {
   if (!ready) {
     return (
       <div className="rounded-lg border border-risk-moderate/30 bg-risk-moderate/[0.07] p-4 text-xs">
-        Heart model file is missing. Add <code>heart.glb</code> per{" "}
-        <code>public/models/CREDITS.md</code>. The 2D schematic below stays live.
+        The 3D heart file is missing, so only the 2D schematic below is live.
       </div>
     );
   }

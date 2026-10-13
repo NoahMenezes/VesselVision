@@ -10,7 +10,6 @@ import { SummaryCard } from "./dashboard/SummaryCard";
 import { VesselCards } from "./dashboard/VesselCards";
 import { HeartCanvas } from "./heart/HeartCanvas";
 import { CanvasErrorBoundary } from "./heart/ErrorBoundary";
-import { Schematic2D } from "./heart/VesselLegend";
 import { useStore } from "@/store/VesselVisionContext";
 
 /** Phase 9: schema-driven form + samples + CSV upload (live against /schema). */
@@ -24,19 +23,18 @@ export function InputPanel() {
 }
 
 /** Phase 10: live 3D heart (GLB myocardium + separate LAD/LCX/RCA tubes).
- *  Probability colors + pulse arrive in Phase 11. */
+ *  Probability colors + pulse arrive in Phase 11. The 2D vessel picker lives
+ *  inside the expanded theatre view, not below the canvas. */
 export function HeartPanel() {
   return (
     <Card className="flex min-h-80 flex-col">
-      <h2 className="mb-1 font-medium">3D heart</h2>
-      <p className="mb-3 text-xs text-foreground/60">
-        Rotate and zoom. Arteries recolor green to red by predicted
-        stenosis probability; click a vessel to inspect it.
-      </p>
+      <div className="mb-3 flex items-baseline justify-between gap-2">
+        <h2 className="text-[15px] font-semibold tracking-tight">3D heart</h2>
+        <p className="shrink-0 text-xs text-muted">⤢ Expand for a better view</p>
+      </div>
       <CanvasErrorBoundary>
         <HeartCanvas />
       </CanvasErrorBoundary>
-      <Schematic2D />
     </Card>
   );
 }

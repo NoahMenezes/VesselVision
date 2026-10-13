@@ -14,7 +14,7 @@ export function StartButton() {
     return (
       <span className="flex flex-col gap-1">
         <Button>Open console</Button>
-        <span className="text-[11px] text-muted">Auth activates after Clerk keys are added.</span>
+        <span className="text-[11px] text-muted">Sign-in unlocks after setup.</span>
       </span>
     );
   }

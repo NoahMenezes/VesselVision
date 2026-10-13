@@ -25,12 +25,12 @@ export function usePrediction() {
       const ok = await getHealth();
       setBackend(ok ? "online" : "offline");
       if (!ok) {
-        setError("The prediction service is offline.");
+        setError("Not connected.");
         return;
       }
       const pred = await postPredict(vals);
       if (!pred) {
-        setError("Prediction unavailable. The trained models are not loaded yet.");
+        setError("No result yet — everything is still loading.");
         setPrediction(null);
         return;
       }

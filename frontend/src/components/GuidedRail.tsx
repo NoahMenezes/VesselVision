@@ -1,8 +1,9 @@
 "use client";
-/** Guided rail: Boardafolio-pattern sidebar (identity, tour, problem, live
- *  pipeline status, per-target dots, outbound links, credit footer).
- *  240px expanded by default with a persisted collapse toggle; icon-only at
- *  64px; hidden on mobile where segmented tabs take over. Absorbs TopBar.
+/** Guided rail: the checkup path down the left edge. One intro link, then
+ *  four numbered steps that say what each screen is for. A single status
+ *  line tells you whether predictions are ready. No tech talk anywhere.
+ *  240px expanded by default with a persisted collapse toggle; numbers only
+ *  at 64px; hidden on mobile where segmented tabs take over.
  */
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
@@ -14,22 +15,18 @@ import {
   Heart,
   HeartPulse,
   Info,
-  Link2,
 } from "lucide-react";
 import { clsx } from "clsx";
-import { usePipelineStatus } from "@/hooks/usePipelineStatus";
 import { useStore } from "@/store/VesselVisionContext";
-import { Badge } from "./ui";
 
-const TOUR = [
-  { id: "problem", label: "The problem", icon: Info },
-  { id: "enter-data", label: "Enter data", icon: ClipboardList },
-  { id: "explore-heart", label: "Explore heart", icon: Heart },
-  { id: "review-risk", label: "Review risk", icon: Activity },
-  { id: "performance", label: "Performance", icon: BarChart3 },
+const STEPS = [
+  { id: "problem", label: "Overview", desc: "What this checks", icon: Info },
+  { id: "enter-data", label: "Patient", desc: "Enter checkup details", icon: ClipboardList },
+  { id: "explore-heart", label: "Heart", desc: "See artery risk in 3D", icon: Heart },
+  { id: "review-risk", label: "Results", desc: "Understand the reasons", icon: Activity },
+  { id: "performance", label: "Accuracy", desc: "How right is it", icon: BarChart3 },
 ] as const;
 
-const VESSELS = ["CAD", "LAD", "LCX", "RCA"] as const;
 const PREF_KEY = "vesselvision-rail-v1";
 
 function subscribeRail(onChange: () => void): () => void {
@@ -49,31 +46,21 @@ function getRailServerSnapshot(): boolean {
   return true;
 }
 
-function Dot({ on, label }: { on: boolean | null; label: string }) {
-  return (
-    <span className="flex items-center gap-2 text-xs" title={label}>
-      <span
-        aria-hidden
-        className={clsx(
-          "inline-block h-2 w-2 rounded-full",
-          on === null ? "bg-border" : on ? "bg-risk-low" : "bg-border",
-        )}
-      />
-      <span className="text-muted">{label}</span>
-    </span>
-  );
-}
+const STATUS = {
+  online: { dot: "bg-risk-low", text: "Ready" },
+  offline: { dot: "bg-risk-high", text: "Not connected" },
+  checking: { dot: "bg-border animate-pulse", text: "Starting…" },
+} as const;
 
 export function GuidedRail() {
   const { backend, tab, setTab, setView, setFlash } = useStore();
-  const status = usePipelineStatus();
   const storedOpen = useSyncExternalStore(subscribeRail, getRailSnapshot, getRailServerSnapshot);
   const [override, setOverride] = useState<boolean | null>(null);
   const open = override ?? storedOpen;
   const [active, setActive] = useState<string>("problem");
 
   useEffect(() => {
-    const ids = TOUR.map((t) => t.id);
+    const ids = STEPS.map((t) => t.id);
     const observer = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
@@ -128,9 +115,11 @@ export function GuidedRail() {
     });
   };
 
+  const status = STATUS[backend];
+
   return (
     <aside
-      aria-label="Guided tour"
+      aria-label="Checkup steps"
       className={clsx(
         "sticky top-0 hidden h-dvh shrink-0 flex-col bg-rail lg:flex",
         open ? "w-60" : "w-16",
@@ -141,71 +130,67 @@ export function GuidedRail() {
         {open && (
           <div className="leading-tight">
             <p className="text-sm font-bold tracking-tight">VesselVision</p>
-            <p className="text-[11px] text-muted">Track A · CAD risk</p>
+            <p className="text-[11px] text-muted">Heart risk checker</p>
           </div>
         )}
       </div>
 
-      {open && (
-        <div className="px-4 pt-3">
-          <Badge tone={backend === "online" ? "low" : backend === "offline" ? "high" : "neutral"}>
-            {backend === "online" ? "Predictions live" : backend === "offline" ? "Predictions offline" : "Connecting"}
-          </Badge>
-        </div>
-      )}
+      <div className={clsx("flex items-center gap-2 px-4 pt-3", !open && "justify-center px-0")}>
+        <span aria-hidden className={clsx("inline-block h-2 w-2 shrink-0 rounded-full", status.dot)} />
+        {open && (
+          <span className="text-xs text-muted" role="status">
+            {status.text}
+          </span>
+        )}
+      </div>
 
-      <nav aria-label="Judges tour" className="mt-4 flex flex-col gap-0.5 px-2">
-        {TOUR.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => go(t.id)}
-            aria-current={active === t.id ? "true" : undefined}
-            title={t.label}
-            className={clsx(
-              "flex items-center gap-3 rounded-md px-2 py-2 text-sm transition-colors duration-200 hover:bg-black/[0.04]",
-              active === t.id ? "font-semibold text-foreground" : "font-normal text-muted",
-            )}
-          >
-            <t.icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
-            {open && <span>{t.label}</span>}
-          </button>
-        ))}
+      <nav aria-label="Sections" className="mt-4 flex flex-col gap-1 px-2">
+        {STEPS.map((t, i) => {
+          const isActive = active === t.id;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => go(t.id)}
+              aria-current={isActive ? "true" : undefined}
+              title={`${t.label}: ${t.desc}`}
+              className={clsx(
+                "flex items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors duration-200 hover:bg-black/[0.04]",
+                !open && "justify-center",
+              )}
+            >
+              {open ? (
+                <>
+                  <span
+                    aria-hidden
+                    className={clsx(
+                      "tnum flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
+                      isActive ? "bg-foreground text-white" : "border border-border text-muted",
+                    )}
+                  >
+                    {i === 0 ? "•" : i}
+                  </span>
+                  <span className="leading-tight">
+                    <span className={clsx("block text-sm", isActive ? "font-semibold text-foreground" : "font-normal text-muted")}>
+                      {t.label}
+                    </span>
+                    <span className="block text-[11px] text-muted">{t.desc}</span>
+                  </span>
+                </>
+              ) : (
+                <t.icon
+                  aria-hidden
+                  className={clsx("h-[18px] w-[18px] shrink-0", isActive ? "text-foreground" : "text-muted")}
+                />
+              )}
+            </button>
+          );
+        })}
       </nav>
-
-      {open && (
-        <div className="mt-4 border-t border-border-soft px-4 pt-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">Pipeline</p>
-          <div className="mt-2 space-y-1.5">
-            <Dot on={status.api} label="Service online" />
-            <Dot on={status.schema} label="Patient fields ready" />
-            <Dot on={status.models} label="Risk models ready" />
-            <Dot on={status.explain} label="Plain-word reasons" />
-          </div>
-          <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">Targets</p>
-          {status.models ? (
-            <div className="mt-2 space-y-1.5">
-              {VESSELS.map((v) => (
-                <Dot key={v} on={true} label={`${v} live`} />
-              ))}
-            </div>
-          ) : (
-            <p className="mt-1 text-[11px] text-muted">Models appear here after training finishes.</p>
-          )}
-        </div>
-      )}
 
       <div className="mt-auto px-2 pb-3">
         {open && (
-          <div className="mb-2 space-y-0.5 px-2 text-xs">
-            <a
-              className="flex items-center gap-2 py-1 text-muted hover:text-foreground"
-              href={`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/docs`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Link2 className="h-3.5 w-3.5" aria-hidden /> API docs
-            </a>
+          <div className="mb-2 px-2 text-xs">
             <a
               className="flex items-center gap-2 py-1 text-muted hover:text-foreground"
               href="https://github.com/NoahMenezes/VesselVision"
@@ -214,13 +199,8 @@ export function GuidedRail() {
             >
               <FlaskConical className="h-3.5 w-3.5" aria-hidden /> GitHub
             </a>
-            <p className="py-1 text-muted">Demo video lands before submission.</p>
+            <p className="py-1 text-muted">For decision support only.</p>
           </div>
-        )}
-        {open && (
-          <p className="border-t border-border-soft px-2 pt-2 text-[10px] leading-snug text-muted">
-            Decision support only. Data: UCI-411 CC-BY. Heart: Sketchfab, license TBD.
-          </p>
         )}
         <button
           type="button"

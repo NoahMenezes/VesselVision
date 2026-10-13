@@ -14,7 +14,7 @@ const STEPS = [
 const STATS: [string, string][] = [
   ["303", "patients studied"],
   ["54", "clinical fields"],
-  ["4", "targets: CAD, LAD, LCX, RCA"],
+  ["4", "risk scores: overall + 3 arteries"],
 ];
 
 export default function Landing() {
@@ -26,7 +26,7 @@ export default function Landing() {
         <section aria-label="Introduction" className="grid items-center gap-8 py-10 lg:grid-cols-2 lg:py-16">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-accent">
-              Track A · Cardiovascular risk
+              Heart disease risk, made visible
             </p>
             <h1 className="mt-2 max-w-xl text-4xl font-bold leading-tight lg:text-5xl">
               Angiography answers CAD late and invasively. Routine workup already holds the signal.
@@ -65,7 +65,8 @@ export default function Landing() {
       </main>
       <Disclaimer />
       <footer className="border-t border-border-soft px-4 py-4 text-center text-[11px] text-muted lg:px-6">
-        Decision support and education only. Data: UCI-411 CC-BY. Heart model: Sketchfab, license TBD.
+        Decision support and education only. Patient data: Z-Alizadeh Sani study (UCI).
+        Heart model: open-license 3D asset.
       </footer>
     </div>
   );
