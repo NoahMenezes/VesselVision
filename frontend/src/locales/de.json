@@ -34,5 +34,13 @@
     "LCX": "Linke Circumflexa",
     "RCA": "Rechte Koronararterie"
   },
-  "rangeNote": "± zeigt die typische Schwankung über Validierungsrunden."
+  "rangeNote": "± zeigt die typische Schwankung über Validierungsrunden.",
+  "nextTitle": "Empfohlene nächste Schritte",
+  "rQuit": "Mit dem Rauchen aufhören",
+  "rBp": "Blutdruck kontrollieren",
+  "rLdl": "Cholesterin senken",
+  "rSugar": "Blutzucker prüfen",
+  "rWeight": "Gewicht ansprechen",
+  "rPump": "Pumpleistung abklären",
+  "rRoutine": "Regelmäßige Kontrollen fortsetzen"
 }

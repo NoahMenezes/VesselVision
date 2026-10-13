@@ -17,6 +17,12 @@ from app.schemas import HealthResponse
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     load_artifacts()  # never raises; records missing models for 503s
+    try:
+        from app.db import ensure_history_table
+
+        await ensure_history_table()
+    except Exception as exc:  # history is optional; predictions unaffected
+        print(f"[history] disabled: {exc}")
     yield
 
 

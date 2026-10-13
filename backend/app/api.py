@@ -41,6 +41,11 @@ class BatchRowResult(BaseModel):
     errors: list[str] = []
 
 
+class HistorySave(BaseModel):
+    label: str = ""
+    inputs: dict[str, Any] = {}
+
+
 @router.get("/schema")
 def read_schema() -> dict[str, Any]:
     import json
@@ -161,6 +166,45 @@ def read_metrics() -> dict[str, Any]:
             detail="No metrics yet. " + TRAIN_GUIDANCE,
         )
     return payload
+
+
+@router.post("/history")
+async def create_history(body: HistorySave) -> dict[str, Any]:
+    """Score inputs and store the checkup (needs DATABASE_URL/Neon)."""
+    from app import db
+
+    coerced, errors = validate_inputs(body.inputs)
+    if errors:
+        raise HTTPException(status_code=422, detail=errors)
+    try:
+        pred = predict_one(coerced)
+    except ModelNotTrainedError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    try:
+        record_id = await db.save_record(body.label, coerced, pred)
+    except db.HistoryUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return {"id": record_id, "prediction": pred}
+
+
+@router.get("/history")
+async def read_history() -> list[dict[str, Any]]:
+    from app import db
+
+    try:
+        return await db.list_records()
+    except db.HistoryUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@router.delete("/history/{record_id}")
+async def remove_history(record_id: int) -> dict[str, bool]:
+    from app import db
+
+    try:
+        return {"deleted": await db.delete_record(record_id)}
+    except db.HistoryUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.get("/uncertainty")

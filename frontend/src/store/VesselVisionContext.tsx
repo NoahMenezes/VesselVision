@@ -11,6 +11,12 @@ import type {
   VesselKey,
 } from "@/lib/types";
 
+export interface Baseline {
+  inputs: Record<string, number | string>;
+  prediction: PredictResponse;
+  at: number;
+}
+
 interface Store {
   inputs: Record<string, number | string>;
   setInputs: (v: Record<string, number | string>) => void;
@@ -35,7 +41,9 @@ interface Store {
   setError: (v: string | null) => void;
   backend: BackendStatus;
   setBackend: (v: BackendStatus) => void;
-}
+  /** Pinned recovery baseline (theatre compare + report section share it). */
+  baseline: Baseline | null;
+  setBaseline: (v: Baseline | null) => void;
 
 const Ctx = createContext<Store | null>(null);
 
@@ -53,15 +61,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [backend, setBackend] = useState<BackendStatus>("checking");
+  const [baseline, setBaseline] = useState<Baseline | null>(null);
   const value = useMemo(
     () => ({
       inputs, setInputs, prediction, setPrediction, explanation,
       setExplanation, selected, setSelected, hoverVessel, setHoverVessel,
       tab, setTab, view, setView, flash, setFlash,
       loading, setLoading,
-      error, setError, backend, setBackend,
+      error, setError, backend, setBackend, baseline, setBaseline,
     }),
-    [inputs, prediction, explanation, selected, hoverVessel, tab, view, flash, loading, error, backend],
+    [inputs, prediction, explanation, selected, hoverVessel, tab, view, flash, loading, error, backend, baseline],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

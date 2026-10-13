@@ -34,5 +34,13 @@
     "LCX": "Sirkumfleksa kiri",
     "RCA": "Arteri koroner kanan"
   },
-  "rangeNote": "± menunjukkan variasi tipikal antar putaran validasi."
+  "rangeNote": "± menunjukkan variasi tipikal antar putaran validasi.",
+  "nextTitle": "Langkah berikutnya yang disarankan",
+  "rQuit": "Berhenti merokok",
+  "rBp": "Kendalikan tekanan darah",
+  "rLdl": "Turunkan kolesterol",
+  "rSugar": "Periksa gula darah",
+  "rWeight": "Diskusikan berat badan",
+  "rPump": "Periksa kekuatan pompa",
+  "rRoutine": "Lanjutkan pemeriksaan rutin"
 }

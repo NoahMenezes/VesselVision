@@ -34,5 +34,13 @@
     "LCX": "Circunflexa esquerda",
     "RCA": "Coronária direita"
   },
-  "rangeNote": "± mostra a variação típica entre rondas de validação."
+  "rangeNote": "± mostra a variação típica entre rondas de validação.",
+  "nextTitle": "Próximos passos recomendados",
+  "rQuit": "Deixar de fumar",
+  "rBp": "Controlar a pressão arterial",
+  "rLdl": "Baixar o colesterol",
+  "rSugar": "Verificar o açúcar no sangue",
+  "rWeight": "Falar sobre o peso",
+  "rPump": "Reavaliar a força de bombagem",
+  "rRoutine": "Manter consultas regulares"
 }

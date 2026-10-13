@@ -10,6 +10,8 @@
 import { useEffect, useState } from "react";
 import { getSchema, getUncertainty } from "@/lib/api";
 import type { UncertaintyResponse } from "@/lib/types";
+import { recommendations } from "@/lib/recommend";
+import type { NextId } from "@/lib/recommend";
 import { detectLocale, fill, REPORT_LANGS, REPORT_LOCALES, REPORT_STRINGS } from "@/lib/i18n";
 import type { ReportLang } from "@/lib/i18n";
 import type { FeatureSchema, VesselKey } from "@/lib/types";
@@ -149,6 +151,34 @@ export function ReportTab() {
         </table>
         <p className="mt-1.5 text-[11px] text-muted">{t.rangeNote}</p>
       </Card>
+
+      {(() => {
+        const recs = recommendations(inputs, explanation);
+        const titles: Record<NextId, string> = {
+          quit: t.rQuit,
+          bp: t.rBp,
+          ldl: t.rLdl,
+          sugar: t.rSugar,
+          weight: t.rWeight,
+          pump: t.rPump,
+          routine: t.rRoutine,
+        };
+        return (
+          <Card>
+            <h3 className="mb-1 text-sm font-medium">{t.nextTitle}</h3>
+            <ol className="space-y-2 text-xs">
+              {recs.map((r, i) => (
+                <li key={r.id} className="border-t border-border-soft pt-2 first:border-t-0 first:pt-0">
+                  <p className="font-semibold">
+                    {i + 1}. {titles[r.id] ?? r.id}
+                  </p>
+                  <p className="mt-0.5 leading-relaxed text-foreground/70">{r.detail}</p>
+                </li>
+              ))}
+            </ol>
+          </Card>
+        );
+      })()}
 
       {drivers.length > 0 && (
         <Card>

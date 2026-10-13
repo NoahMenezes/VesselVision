@@ -81,6 +81,14 @@ export interface ReportStrings {
   signal: string;
   outOfRange: string;
   rangeNote: string;
+  nextTitle: string;
+  rQuit: string;
+  rBp: string;
+  rLdl: string;
+  rSugar: string;
+  rWeight: string;
+  rPump: string;
+  rRoutine: string;
   safety: string;
   print: string;
   anatomy: Record<VesselKey, string>;

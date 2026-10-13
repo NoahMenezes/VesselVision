@@ -34,5 +34,13 @@
     "LCX": "Left circumflex",
     "RCA": "Right coronary artery"
   },
-  "rangeNote": "± shows typical variation across validation rounds."
+  "rangeNote": "± shows typical variation across validation rounds.",
+  "nextTitle": "Recommended next steps",
+  "rQuit": "Quit smoking",
+  "rBp": "Control blood pressure",
+  "rLdl": "Lower cholesterol",
+  "rSugar": "Check blood sugar",
+  "rWeight": "Discuss weight",
+  "rPump": "Follow up on pump strength",
+  "rRoutine": "Keep regular checkups"
 }

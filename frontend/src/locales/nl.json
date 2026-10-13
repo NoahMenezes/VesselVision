@@ -34,5 +34,13 @@
     "LCX": "Linker circumflex",
     "RCA": "Rechter kransslagader"
   },
-  "rangeNote": "± toont de typische variatie over validatierondes."
+  "rangeNote": "± toont de typische variatie over validatierondes.",
+  "nextTitle": "Aanbevolen vervolgstappen",
+  "rQuit": "Stoppen met roken",
+  "rBp": "Bloeddruk onder controle",
+  "rLdl": "Cholesterol verlagen",
+  "rSugar": "Bloedsuiker controleren",
+  "rWeight": "Gewicht bespreken",
+  "rPump": "Pompfunctie laten controleren",
+  "rRoutine": "Regelmatige controles voortzetten"
 }

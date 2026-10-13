@@ -164,3 +164,16 @@ def test_batch_row_limit_413():
 def test_batch_byte_limit_413():
     res = client.post("/predict-batch", files={"file": ("up.csv", b"a,b\n" + b"x," * 1_100_000)})
     assert res.status_code == 413
+
+
+def test_history_unavailable_without_db(monkeypatch):
+    import app.db as db
+
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    db.reset_pool()
+    res = client.post("/history", json={"label": "x", "inputs": {"age": 50}})
+    assert res.status_code == 503
+    res = client.get("/history")
+    assert res.status_code == 503
+    res = client.delete("/history/1")
+    assert res.status_code == 503

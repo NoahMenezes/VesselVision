@@ -34,5 +34,13 @@
     "LCX": "Circonflexe gauche",
     "RCA": "Artère coronaire droite"
   },
-  "rangeNote": "± indique la variation typique entre les rondes de validation."
+  "rangeNote": "± indique la variation typique entre les rondes de validation.",
+  "nextTitle": "Prochaines étapes recommandées",
+  "rQuit": "Arrêter de fumer",
+  "rBp": "Contrôler la tension artérielle",
+  "rLdl": "Réduire le cholestérol",
+  "rSugar": "Contrôler la glycémie",
+  "rWeight": "Parler du poids",
+  "rPump": "Revoir la force de pompage",
+  "rRoutine": "Poursuivre les contrôles réguliers"
 }
