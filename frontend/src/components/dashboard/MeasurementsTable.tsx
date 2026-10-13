@@ -39,7 +39,8 @@ export function MeasurementsTable() {
   return (
     <Card>
       <h3 className="mb-2 text-sm font-medium">Measurements</h3>
-      <table className="tnum w-full text-left text-xs">
+      <div className="max-sm:overflow-x-auto">
+      <table className="tnum w-full text-left text-xs max-sm:min-w-[540px]">
         <thead>
           <tr className="text-foreground/50">
             <th className="py-1 pr-2 font-medium">Measure</th>
@@ -74,6 +75,7 @@ export function MeasurementsTable() {
           })}
         </tbody>
       </table>
+      </div>
     </Card>
   );
 }

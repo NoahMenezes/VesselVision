@@ -13,6 +13,7 @@ const KEY = "vesselvision-theme";
 type Theme = "light" | "dark";
 
 function subscribeTheme(onChange: () => void): () => void {
+  if (typeof MutationObserver === "undefined") return () => {};
   const obs = new MutationObserver(onChange);
   obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   return () => obs.disconnect();

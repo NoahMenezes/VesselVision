@@ -7,10 +7,12 @@ import { useEffect } from "react";
 import { clsx } from "clsx";
 import { getHealth } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
+import { HeartPulse } from "lucide-react";
 import { PredictionDriver } from "@/hooks/usePrediction";
 import { PerformanceTab } from "./dashboard/PerformanceTab";
 import { Disclaimer } from "./Disclaimer";
 import { GuidedRail } from "./GuidedRail";
+import { ThemeToggle } from "./ThemeToggle";
 import { HeartPanel, InputPanel, ResultsPanel, StepStrip } from "./panels";
 import { Onboarding } from "./Onboarding";
 
@@ -62,6 +64,26 @@ export function Dashboard() {
       <PredictionDriver />
       <GuidedRail />
       <div className="flex min-w-0 flex-1 flex-col">
+        {/* Mobile-only top bar: brand, status, theme. Desktop uses the rail. */}
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-border-soft bg-surface/90 px-4 py-2 backdrop-blur lg:hidden">
+          <span className="flex items-center gap-1.5">
+            <HeartPulse className="h-5 w-5 text-accent" aria-hidden />
+            <span className="text-sm font-bold tracking-tight">VesselVision</span>
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 text-[11px] text-muted" role="status">
+              <span
+                aria-hidden
+                className={clsx(
+                  "inline-block h-2 w-2 rounded-full",
+                  backend === "online" ? "bg-risk-low" : backend === "offline" ? "bg-risk-high" : "bg-border animate-pulse",
+                )}
+              />
+              {backend === "online" ? "Ready" : backend === "offline" ? "Offline" : "Starting"}
+            </span>
+            <ThemeToggle />
+          </span>
+        </div>
         <Disclaimer />
         <Onboarding />
         <div aria-live="polite" className="sr-only">

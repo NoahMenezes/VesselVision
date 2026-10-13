@@ -243,7 +243,7 @@ export function HeartScene() {
       branch below instead — no boxes, no borders around the heart. */
   const viewport = () => (
     <div
-      className="relative h-105 w-full cursor-grab overflow-hidden rounded-xl border border-border shadow-sm active:cursor-grabbing"
+      className="relative h-80 w-full cursor-grab overflow-hidden rounded-xl border border-border shadow-sm active:cursor-grabbing sm:h-105"
       onPointerDown={(e) => {
         downPos.current = { x: e.clientX, y: e.clientY };
       }}

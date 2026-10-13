@@ -92,6 +92,14 @@
   100% { transform: scale(1); }
 }
 
+/* Small phones: floating heart chips compact so the muscle stays visible. */
+@media (max-width: 639px) {
+  [data-chip] {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

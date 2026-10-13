@@ -33,6 +33,7 @@ function Chip({ vessel }: { vessel: VesselKey }) {
     >
       <button
         type="button"
+        data-chip
         aria-label={`Select ${ANATOMY_MAP[vessel]}`}
         aria-pressed={active}
         onClick={() => setSelected(active ? "CAD" : vessel)}

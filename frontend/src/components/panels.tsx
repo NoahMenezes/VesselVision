@@ -52,7 +52,7 @@ export function StepStrip() {
   ];
   return (
     <div>
-      <ol aria-label="Steps" className="flex items-center justify-center gap-2 sm:gap-3">
+      <ol aria-label="Steps" className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
         {steps.map((s, i) => (
           <li key={s.n} className="flex items-center gap-2 sm:gap-3">
             {i > 0 && (
