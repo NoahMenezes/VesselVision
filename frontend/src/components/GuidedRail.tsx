@@ -1,18 +1,19 @@
 "use client";
-/** Guided rail: the checkup path down the left edge. One intro link, then
- *  four numbered steps that say what each screen is for. A single status
- *  line tells you whether predictions are ready. No tech talk anywhere.
- *  240px expanded by default with a persisted collapse toggle; numbers only
- *  at 64px; hidden on mobile where segmented tabs take over.
+/** Guided rail: the checkup path down the left edge. Patient and Heart live
+ *  in the overview itself, so the rail keeps Overview, Results, Accuracy
+ *  plus a printable Report and a Docs link. One status line tells you
+ *  whether predictions are ready. No tech talk anywhere.
+ *  240px expanded by default with a labeled, persisted collapse toggle;
+ *  icon + tiny label at 64px; hidden on mobile where tabs take over.
  */
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   Activity,
   BarChart3,
+  BookOpen,
   ChevronLeft,
-  ClipboardList,
+  FileText,
   FlaskConical,
-  Heart,
   HeartPulse,
   Info,
 } from "lucide-react";
@@ -21,11 +22,13 @@ import { useStore } from "@/store/VesselVisionContext";
 
 const STEPS = [
   { id: "problem", label: "Overview", desc: "What this checks", icon: Info },
-  { id: "enter-data", label: "Patient", desc: "Enter checkup details", icon: ClipboardList },
-  { id: "explore-heart", label: "Heart", desc: "See artery risk in 3D", icon: Heart },
   { id: "review-risk", label: "Results", desc: "Understand the reasons", icon: Activity },
   { id: "performance", label: "Accuracy", desc: "How right is it", icon: BarChart3 },
+  { id: "report", label: "Report", desc: "Print or save", icon: FileText },
 ] as const;
+
+const DOCS_URL =
+  "https://github.com/NoahMenezes/VesselVision/blob/main/docs/VesselVision_Documentation.md";
 
 const PREF_KEY = "vesselvision-rail-v1";
 
@@ -54,11 +57,11 @@ const STATUS = {
 
 export function GuidedRail() {
   const { backend, tab, setTab, setView, setFlash, prediction, loading } = useStore();
-  const unlocked = prediction !== null || loading;
   const storedOpen = useSyncExternalStore(subscribeRail, getRailSnapshot, getRailServerSnapshot);
   const [override, setOverride] = useState<boolean | null>(null);
   const open = override ?? storedOpen;
   const [active, setActive] = useState<string>("problem");
+  const unlocked = prediction !== null || loading;
 
   useEffect(() => {
     const ids = STEPS.map((t) => t.id);
@@ -88,14 +91,15 @@ export function GuidedRail() {
   };
 
   const go = (id: string) => {
-    // Each tour stop opens its own page: the section fills the screen, so
+    // Each stop opens its own page: the section fills the screen, so
     // the navigation visibly acts even when nothing needs scrolling.
-    const viewFor: Record<string, "overview" | "input" | "heart" | "results" | "performance"> = {
+    const viewFor: Record<string, "overview" | "input" | "heart" | "results" | "performance" | "report"> = {
       problem: "overview",
       "enter-data": "input",
       "explore-heart": "heart",
       "review-risk": "results",
       performance: "performance",
+      report: "report",
     };
     const tabFor: Record<string, "input" | "heart" | "results" | "performance"> = {
       problem: tab,
@@ -103,6 +107,7 @@ export function GuidedRail() {
       "explore-heart": "heart",
       "review-risk": "results",
       performance: "performance",
+      report: tab,
     };
     setView(viewFor[id]);
     setTab(tabFor[id]);
@@ -153,7 +158,7 @@ export function GuidedRail() {
       <nav aria-label="Sections" className="mt-2 flex flex-col gap-1 px-2">
         {STEPS.map((t, i) => {
           const isActive = active === t.id;
-          const gated = !unlocked && (t.id === "explore-heart" || t.id === "review-risk");
+          const gated = !unlocked && (t.id === "review-risk" || t.id === "report");
           return (
             <button
               key={t.id}
@@ -206,6 +211,14 @@ export function GuidedRail() {
           <div className="mb-2 px-2 text-xs">
             <a
               className="flex items-center gap-2 py-1 text-muted hover:text-foreground"
+              href={DOCS_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <BookOpen className="h-3.5 w-3.5" aria-hidden /> Docs
+            </a>
+            <a
+              className="flex items-center gap-2 py-1 text-muted hover:text-foreground"
               href="https://github.com/NoahMenezes/VesselVision"
               target="_blank"
               rel="noreferrer"
@@ -220,8 +233,13 @@ export function GuidedRail() {
           onClick={toggle}
           aria-expanded={open}
           aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
-          className="mt-2 flex w-full items-center justify-center rounded-md border border-border bg-surface py-1.5 hover:bg-surface-soft"
+          title={open ? "Collapse sidebar" : "Expand sidebar"}
+          className={clsx(
+            "mt-2 flex w-full items-center rounded-md border border-border bg-surface py-1.5 hover:bg-surface-soft",
+            open ? "justify-between px-3" : "justify-center",
+          )}
         >
+          {open && <span className="text-xs font-medium text-muted">Collapse</span>}
           <ChevronLeft className={clsx("h-4 w-4 text-muted transition-transform", !open && "rotate-180")} aria-hidden />
         </button>
       </div>

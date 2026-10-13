@@ -10,6 +10,7 @@ import { useStore } from "@/store/VesselVisionContext";
 import { HeartPulse } from "lucide-react";
 import { PredictionDriver } from "@/hooks/usePrediction";
 import { PerformanceTab } from "./dashboard/PerformanceTab";
+import { ReportTab } from "./dashboard/ReportTab";
 import { Disclaimer } from "./Disclaimer";
 import { GuidedRail } from "./GuidedRail";
 import { ThemeToggle } from "./ThemeToggle";
@@ -23,11 +24,12 @@ export function useUnlocked() {
 }
 
 /** Mobile-only switcher: Patient and Heart already live in the overview
- *  scroll below, so the switcher keeps just Risk and Scores as focused pages.
- *  Desktop never renders this (lg:hidden) and keeps its rail + grid. */
+ *  scroll below, so the switcher keeps Risk, Scores, and Report as focused
+ *  pages. Desktop never renders this (lg:hidden) and keeps its rail + grid. */
 const MOBILE_TABS = [
   { id: "results", label: "Risk" },
   { id: "performance", label: "Scores" },
+  { id: "report", label: "Report" },
 ] as const;
 
 export function ProblemStrip() {
@@ -100,7 +102,7 @@ export function Dashboard() {
         )}
         {/* Mobile section switch (Risk unlocks after prediction) */}
         <nav aria-label="Dashboard sections" className="p-3 lg:hidden">
-          <div role="group" className="grid grid-cols-2 rounded-lg bg-rail p-1">
+          <div role="group" className="grid grid-cols-3 rounded-lg bg-rail p-1">
             {MOBILE_TABS.map((t) => {
               const gated = !unlocked && t.id === "results";
               return (
@@ -111,14 +113,15 @@ export function Dashboard() {
                   title={gated ? "Unlocks after your first prediction" : undefined}
                   onClick={() => {
                     // Tapping the active tab returns to the overview grid.
-                    if (tab === t.id && view !== "overview") {
+                    // Report has no tab slot of its own; the view tracks it.
+                    if ((tab === t.id || view === t.id) && view !== "overview") {
                       setView("overview");
                     } else {
-                      setTab(t.id);
+                      if (t.id !== "report") setTab(t.id);
                       setView(t.id);
                     }
                   }}
-                  aria-pressed={tab === t.id}
+                  aria-pressed={t.id === "report" ? view === "report" : tab === t.id}
                   className={clsx(
                     "rounded-md px-1 py-2 text-[13px] font-semibold transition-colors duration-200",
                     tab === t.id ? "bg-surface text-foreground shadow-sm" : "text-muted",
@@ -194,6 +197,7 @@ function FocusedPage() {
       {view === "input" && <InputPanel />}
       {view === "heart" && <HeartPanel />}
       {view === "results" && <ResultsPanel />}
+      {view === "report" && <ReportTab />}
       {view === "performance" && (
         <div id="performance" className="scroll-mt-4">
           <PerformanceTab />

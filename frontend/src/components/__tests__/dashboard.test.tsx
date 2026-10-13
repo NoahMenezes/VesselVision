@@ -40,6 +40,7 @@ describe("mobile section switch", () => {
     const tabs = within(screen.getByRole("navigation", { name: "Dashboard sections" }));
     expect(tabs.queryByRole("button", { name: "Data" })).toBeNull();
     expect(tabs.queryByRole("button", { name: "Heart" })).toBeNull();
+    expect(tabs.getByRole("button", { name: "Report" })).toBeDefined();
     expect((tabs.getByRole("button", { name: "Risk" }) as HTMLButtonElement).disabled).toBe(true);
     const scores = tabs.getByRole("button", { name: "Scores" });
     fireEvent.click(scores);
