@@ -6,6 +6,7 @@ import type {
   BatchRowResult,
   ExplainResponse,
   FeatureSchema,
+  HistoryRecord,
   PredictResponse,
   SamplePatient,
   UncertaintyResponse,
@@ -69,6 +70,39 @@ export async function getUncertainty(): Promise<UncertaintyResponse | null> {
     return uncertaintyCache;
   } catch {
     return null;
+  }
+}
+
+/** Checkup history (needs DATABASE_URL/Neon server-side). Null means
+ *  unavailable — the UI says so instead of breaking. */
+export async function getHistory(): Promise<HistoryRecord[] | null> {
+  try {
+    return (await api.get("/history")).data as HistoryRecord[];
+  } catch {
+    return null;
+  }
+}
+
+export async function postHistory(
+  label: string,
+  inputs: Record<string, number | string>,
+): Promise<{ id: number; prediction: PredictResponse } | null> {
+  try {
+    return (await api.post("/history", { label, inputs })).data as {
+      id: number;
+      prediction: PredictResponse;
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteHistory(id: number): Promise<boolean> {
+  try {
+    await api.delete(`/history/${id}`);
+    return true;
+  } catch {
+    return false;
   }
 }
 

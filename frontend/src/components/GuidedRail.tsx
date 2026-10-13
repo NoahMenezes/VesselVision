@@ -15,6 +15,7 @@ import {
   FileText,
   FlaskConical,
   HeartPulse,
+  History,
   Info,
 } from "lucide-react";
 import { clsx } from "clsx";
@@ -93,13 +94,17 @@ export function GuidedRail() {
   const go = (id: string) => {
     // Each stop opens its own page: the section fills the screen, so
     // the navigation visibly acts even when nothing needs scrolling.
-    const viewFor: Record<string, "overview" | "input" | "heart" | "results" | "performance" | "report"> = {
+    const viewFor: Record<
+      string,
+      "overview" | "input" | "heart" | "results" | "performance" | "report" | "history"
+    > = {
       problem: "overview",
       "enter-data": "input",
       "explore-heart": "heart",
       "review-risk": "results",
       performance: "performance",
       report: "report",
+      history: "history",
     };
     const tabFor: Record<string, "input" | "heart" | "results" | "performance"> = {
       problem: tab,
@@ -112,6 +117,7 @@ export function GuidedRail() {
     setView(viewFor[id]);
     setTab(tabFor[id]);
     setFlash(null);
+    setActive(id);
     requestAnimationFrame(() => {
       if (id === "problem") {
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -150,6 +156,34 @@ export function GuidedRail() {
         )}
       </div>
 
+      <div className="px-2 pt-3">
+        <button
+          type="button"
+          onClick={() => go("history")}
+          aria-current={active === "history" ? "true" : undefined}
+          title="History: past checkups, trends, reload"
+          className={clsx(
+            "flex w-full items-center gap-3 rounded-lg border border-accent/30 bg-accent/[0.07] px-2 py-2 text-left transition-colors duration-200 hover:bg-accent/[0.12]",
+            !open && "flex-col justify-center gap-1",
+          )}
+        >
+          <History
+            aria-hidden
+            className={clsx(
+              "h-[18px] w-[18px] shrink-0",
+              active === "history" ? "text-accent" : "text-muted",
+            )}
+          />
+          {open ? (
+            <span className="leading-tight">
+              <span className="block text-sm font-semibold text-foreground">History</span>
+              <span className="block text-[11px] text-muted">Past checkups</span>
+            </span>
+          ) : (
+            <span className="text-[9px] font-semibold leading-none text-muted">History</span>
+          )}
+        </button>
+      </div>
       {open && (
         <p className="px-4 pt-4 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">
           Checkup steps

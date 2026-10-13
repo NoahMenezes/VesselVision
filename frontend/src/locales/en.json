@@ -42,5 +42,6 @@
   "rSugar": "Check blood sugar",
   "rWeight": "Discuss weight",
   "rPump": "Follow up on pump strength",
-  "rRoutine": "Keep regular checkups"
+  "rRoutine": "Keep regular checkups",
+  "recoveryTitle": "Recovery check"
 }

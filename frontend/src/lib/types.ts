@@ -66,4 +66,16 @@ export interface UncertaintyBand {
 
 export type UncertaintyResponse = Record<string, UncertaintyBand>;
 
+export interface HistoryRecord {
+  id: number;
+  created_at: string;
+  label: string;
+  inputs: Record<string, number | string>;
+  cad: number;
+  lad: number;
+  lcx: number;
+  rca: number;
+  cad_label: number;
+}
+
 export type BackendStatus = "checking" | "online" | "offline";

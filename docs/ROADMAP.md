@@ -21,10 +21,9 @@ are built; unchecked items are future work. Nothing here blocks the demo.
   header field. (Print/save-via-browser works today.)
 - [ ] **Per-artery what-if deltas** — what-if currently previews CAD only;
   extend the preview to LAD/LCX/RCA so tweaks visibly move the 3D heart.
-- [ ] **Prediction history (needs a database)** — today the API is stateless:
-  uploads parse in memory, nothing is stored. If history is ever wanted, add
-  SQLite (single file, zero ops) behind explicit consent, keeping only
-  de-identified inputs + scores with a retention policy. Not for the hackathon.
+- [x] **Prediction history (Neon Postgres)** — `GET/POST/DELETE /history`
+  store checkups in Neon; the API stays fully usable with it off (503 +
+  guidance). History dashboard with CAD trend chart, reload, and delete.
 
 ## Out of scope for the hackathon
 

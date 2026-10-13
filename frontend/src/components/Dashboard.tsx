@@ -9,6 +9,7 @@ import { getHealth } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
 import { HeartPulse } from "lucide-react";
 import { PredictionDriver } from "@/hooks/usePrediction";
+import { HistoryTab } from "./dashboard/HistoryTab";
 import { PerformanceTab } from "./dashboard/PerformanceTab";
 import { ReportTab } from "./dashboard/ReportTab";
 import { Disclaimer } from "./Disclaimer";
@@ -30,6 +31,7 @@ const MOBILE_TABS = [
   { id: "results", label: "Risk" },
   { id: "performance", label: "Scores" },
   { id: "report", label: "Report" },
+  { id: "history", label: "History" },
 ] as const;
 
 export function ProblemStrip() {
@@ -102,7 +104,7 @@ export function Dashboard() {
         )}
         {/* Mobile section switch (Risk unlocks after prediction) */}
         <nav aria-label="Dashboard sections" className="p-3 lg:hidden">
-          <div role="group" className="grid grid-cols-3 rounded-lg bg-rail p-1">
+          <div role="group" className="grid grid-cols-4 rounded-lg bg-rail p-1">
             {MOBILE_TABS.map((t) => {
               const gated = !unlocked && t.id === "results";
               return (
@@ -117,7 +119,7 @@ export function Dashboard() {
                     if ((tab === t.id || view === t.id) && view !== "overview") {
                       setView("overview");
                     } else {
-                      if (t.id !== "report") setTab(t.id);
+                      if (t.id === "results" || t.id === "performance") setTab(t.id);
                       setView(t.id);
                     }
                   }}
@@ -191,6 +193,13 @@ function PageGrid() {
 function FocusedPage() {
   const { view } = useStore();
   const unlocked = useUnlocked();
+  if (view === "history") {
+    return (
+      <main id="main" className="mx-auto w-full max-w-5xl flex-1 space-y-4 p-3 lg:px-6">
+        <HistoryTab />
+      </main>
+    );
+  }
   if (!unlocked) return <StartPage />;
   return (
     <main id="main" className="mx-auto w-full max-w-3xl flex-1 space-y-4 p-3 lg:px-6">

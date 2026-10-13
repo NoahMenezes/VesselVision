@@ -89,6 +89,7 @@ export interface ReportStrings {
   rWeight: string;
   rPump: string;
   rRoutine: string;
+  recoveryTitle: string;
   safety: string;
   print: string;
   anatomy: Record<VesselKey, string>;

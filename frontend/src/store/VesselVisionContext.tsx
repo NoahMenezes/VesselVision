@@ -31,8 +31,8 @@ interface Store {
   tab: "input" | "heart" | "results" | "performance";
   setTab: (v: "input" | "heart" | "results" | "performance") => void;
   /** Focused page. "overview" shows everything; otherwise one section wide. */
-  view: "overview" | "input" | "heart" | "results" | "performance" | "report";
-  setView: (v: "overview" | "input" | "heart" | "results" | "performance" | "report") => void;
+  view: "overview" | "input" | "heart" | "results" | "performance" | "report" | "history";
+  setView: (v: "overview" | "input" | "heart" | "results" | "performance" | "report" | "history") => void;
   flash: string | null;
   setFlash: (v: string | null) => void;
   loading: boolean;
@@ -44,6 +44,7 @@ interface Store {
   /** Pinned recovery baseline (theatre compare + report section share it). */
   baseline: Baseline | null;
   setBaseline: (v: Baseline | null) => void;
+}
 
 const Ctx = createContext<Store | null>(null);
 
@@ -54,9 +55,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [selected, setSelected] = useState<SelectedTarget>("CAD");
   const [hoverVessel, setHoverVessel] = useState<VesselKey | null>(null);
   const [tab, setTab] = useState<"input" | "heart" | "results" | "performance">("input");
-  const [view, setView] = useState<"overview" | "input" | "heart" | "results" | "performance" | "report">(
-    "overview",
-  );
+  const [view, setView] = useState<
+    "overview" | "input" | "heart" | "results" | "performance" | "report" | "history"
+  >("overview");
   const [flash, setFlash] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

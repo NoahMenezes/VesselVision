@@ -14,7 +14,7 @@ import type { FeatureSchema, SamplePatient, SelectedTarget } from "@/lib/types";
 import { useStore } from "@/store/VesselVisionContext";
 import { usePrediction } from "@/hooks/usePrediction";
 import { flowParams, snapshotRequest } from "./LiveEffects";
-import type { PredictResponse, VesselKey } from "@/lib/types";
+import type { VesselKey } from "@/lib/types";
 import { outOfRange } from "../dashboard/MeasurementsTable";
 
 /** Heart + blood numbers that visibly drive the living heart: pulse sets the
@@ -281,8 +281,8 @@ const INTERVENTIONS: Intervention[] = [
 const COMPARE_CODES = ["CAD", "LAD", "LCX", "RCA"] as const;
 
 function TryIt() {
-  const { inputs, prediction, setInputs } = useStore();
-  const [pin, setPin] = useState<{ inputs: Inputs; prediction: PredictResponse } | null>(null);
+  const { inputs, prediction, setInputs, baseline, setBaseline } = useStore();
+  const pin = baseline;
 
   const deltas =
     pin && prediction
@@ -329,7 +329,7 @@ function TryIt() {
           type="button"
           disabled={!prediction}
           onClick={() => {
-            if (prediction) setPin({ inputs: { ...inputs }, prediction });
+            if (prediction) setBaseline({ inputs: { ...inputs }, prediction, at: Date.now() });
           }}
           className="mt-1.5 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:bg-white/10 disabled:opacity-40"
         >
@@ -362,7 +362,7 @@ function TryIt() {
           </div>
           <button
             type="button"
-            onClick={() => setPin(null)}
+            onClick={() => setBaseline(null)}
             className="mt-2 w-full rounded-md border border-white/10 px-2 py-1 text-[11px] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
           >
             Clear baseline

@@ -8,7 +8,7 @@
  *  and first paint always agree.
  */
 import { useEffect, useState } from "react";
-import { getSchema, getUncertainty } from "@/lib/api";
+import { getSchema, getUncertainty, postHistory } from "@/lib/api";
 import type { UncertaintyResponse } from "@/lib/types";
 import { recommendations } from "@/lib/recommend";
 import type { NextId } from "@/lib/recommend";
@@ -29,9 +29,10 @@ function fmt(v: number | string): string {
 }
 
 export function ReportTab() {
-  const { inputs, prediction, explanation } = useStore();
+  const { inputs, prediction, explanation, baseline, setView, setError } = useStore();
   const [schema, setSchema] = useState<FeatureSchema | null>(null);
   const [unc, setUnc] = useState<UncertaintyResponse | null>(null);
+  const [saving, setSaving] = useState(false);
   // Default locale comes from the browser; the warning suppression below
   // covers the one-paint difference versus SSR English.
   const [lang, setLang] = useState<ReportLang>(() => detectLocale());
@@ -90,6 +91,25 @@ export function ReportTab() {
               </option>
             ))}
           </select>
+          <Button
+            variant="ghost"
+            disabled={saving}
+            onClick={() => {
+              if (saving) return;
+              setSaving(true);
+              postHistory("", inputs).then((res) => {
+                setSaving(false);
+                if (!res) {
+                  setError("Couldn't save — history needs a database.");
+                  return;
+                }
+                setError(null);
+                setView("history");
+              });
+            }}
+          >
+            {saving ? "Saving…" : "Save checkup"}
+          </Button>
           <Button variant="ghost" onClick={() => window.print()}>
             {t.print}
           </Button>
@@ -151,6 +171,50 @@ export function ReportTab() {
         </table>
         <p className="mt-1.5 text-[11px] text-muted">{t.rangeNote}</p>
       </Card>
+
+      {baseline && (
+        <Card>
+          <h3 className="mb-2 text-sm font-medium">{t.recoveryTitle}</h3>
+          <table className="tnum report-table w-full text-left text-xs">
+            <thead>
+              <tr className="text-foreground/50">
+                <th className="py-1 pr-2 font-medium">{t.artery}</th>
+                <th className="py-1 pr-2 font-medium">{t.value}</th>
+                <th className="py-1 font-medium">{t.effect}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(
+                [
+                  ["CAD", baseline.prediction.cad.probability, prediction.cad.probability],
+                  ["LAD", baseline.prediction.vessels.LAD.probability, prediction.vessels.LAD.probability],
+                  ["LCX", baseline.prediction.vessels.LCX.probability, prediction.vessels.LCX.probability],
+                  ["RCA", baseline.prediction.vessels.RCA.probability, prediction.vessels.RCA.probability],
+                ] as [string, number, number][]
+              ).map(([code, b, a]) => {
+                const diff = Math.round((a - b) * 100);
+                return (
+                  <tr key={code} className="border-t border-border">
+                    <td className="py-1.5 pr-2 font-bold">{code}</td>
+                    <td className="py-1.5 pr-2">
+                      {Math.round(b * 100)}→{Math.round(a * 100)}%
+                    </td>
+                    <td className="py-1.5 font-semibold">
+                      {diff < 0 ? (
+                        <>{diff} · {t.lowered}</>
+                      ) : diff > 0 ? (
+                        <>+{diff} · {t.raised}</>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </Card>
+      )}
 
       {(() => {
         const recs = recommendations(inputs, explanation);

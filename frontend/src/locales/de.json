@@ -42,5 +42,6 @@
   "rSugar": "Blutzucker prüfen",
   "rWeight": "Gewicht ansprechen",
   "rPump": "Pumpleistung abklären",
-  "rRoutine": "Regelmäßige Kontrollen fortsetzen"
+  "rRoutine": "Regelmäßige Kontrollen fortsetzen",
+  "recoveryTitle": "Verlaufskontrolle"
 }

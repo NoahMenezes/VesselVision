@@ -42,5 +42,6 @@
   "rSugar": "Controllare la glicemia",
   "rWeight": "Parlare del peso",
   "rPump": "Ricontrollare la forza di pompa",
-  "rRoutine": "Continuare i controlli regolari"
+  "rRoutine": "Continuare i controlli regolari",
+  "recoveryTitle": "Controllo di recupero"
 }
