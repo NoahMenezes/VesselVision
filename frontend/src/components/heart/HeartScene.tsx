@@ -20,7 +20,7 @@ import { OrbitControls } from "@react-three/drei";
 import { useStore } from "@/store/VesselVisionContext";
 import { ANATOMY_MAP } from "@/lib/arteries";
 import { CoronaryTree } from "./CoronaryTree";
-import { BloodFlow, Heartbeat } from "./LiveEffects";
+import { BloodFlow, Heartbeat, SnapshotTaker } from "./LiveEffects";
 import { DataLabels, DataProjector } from "./DataLabels";
 import { Myocardium } from "./Myocardium";
 import { ArteryLabels } from "./ArteryLabels";
@@ -210,6 +210,7 @@ export function HeartScene() {
         </Heartbeat>
       </Suspense>
       <DataProjector />
+      <SnapshotTaker />
       <OrbitControls
         ref={controls}
         makeDefault
@@ -250,6 +251,7 @@ export function HeartScene() {
     >
       <Canvas
         dpr={[1, 1.5]}
+        gl={{ preserveDrawingBuffer: true }}
         camera={{ position: [0, 0.2, 3.4], fov: 42 }}
         onPointerMissed={missedDeselect}
       >
@@ -302,6 +304,7 @@ export function HeartScene() {
         >
           <Canvas
             dpr={[1, 1.5]}
+            gl={{ preserveDrawingBuffer: true }}
             camera={{ position: [0, 0.2, 3.4], fov: 42 }}
             onPointerMissed={missedDeselect}
           >

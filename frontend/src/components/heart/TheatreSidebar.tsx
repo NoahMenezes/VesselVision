@@ -13,7 +13,8 @@ import { ANATOMY_MAP, riskColor } from "@/lib/arteries";
 import type { FeatureSchema, SamplePatient, SelectedTarget } from "@/lib/types";
 import { useStore } from "@/store/VesselVisionContext";
 import { usePrediction } from "@/hooks/usePrediction";
-import { flowParams } from "./LiveEffects";
+import { flowParams, snapshotRequest } from "./LiveEffects";
+import type { PredictResponse, VesselKey } from "@/lib/types";
 import { outOfRange } from "../dashboard/MeasurementsTable";
 
 /** Heart + blood numbers that visibly drive the living heart: pulse sets the
@@ -241,6 +242,146 @@ function RiskReadout({ selected }: { selected: SelectedTarget }) {
   );
 }
 
+type Inputs = Record<string, number | string>;
+
+interface Intervention {
+  id: string;
+  label: string;
+  hint: string;
+  ready: (inputs: Inputs) => boolean;
+  apply: (inputs: Inputs) => Inputs;
+}
+
+/** One-tap what-ifs: rewrite values, the existing auto re-score moves
+ *  the heart. Buttons stay disabled until their base value exists. */
+const INTERVENTIONS: Intervention[] = [
+  {
+    id: "statin",
+    label: "Statin",
+    hint: "LDL −30%",
+    ready: (inp) => typeof inp.ldl === "number",
+    apply: (inp) => ({ ...inp, ldl: Math.round((inp.ldl as number) * 0.7 * 10) / 10 }),
+  },
+  {
+    id: "quit",
+    label: "Quit smoking",
+    hint: "Smoker → ex",
+    ready: (inp) => inp.current_smoker === 1,
+    apply: (inp) => ({ ...inp, current_smoker: 0, ex_smoker: 1 }),
+  },
+  {
+    id: "bp",
+    label: "Control BP",
+    hint: "BP → 120",
+    ready: (inp) => typeof inp.bp === "number",
+    apply: (inp) => ({ ...inp, bp: 120, ...(inp.htn !== undefined ? { htn: 0 } : {}) }),
+  },
+];
+
+const COMPARE_CODES = ["CAD", "LAD", "LCX", "RCA"] as const;
+
+function TryIt() {
+  const { inputs, prediction, setInputs } = useStore();
+  const [pin, setPin] = useState<{ inputs: Inputs; prediction: PredictResponse } | null>(null);
+
+  const deltas =
+    pin && prediction
+      ? COMPARE_CODES.map((code) => {
+          const before =
+            code === "CAD"
+              ? pin.prediction.cad.probability
+              : pin.prediction.vessels[code as VesselKey].probability;
+          const after =
+            code === "CAD"
+              ? prediction.cad.probability
+              : prediction.vessels[code as VesselKey].probability;
+          return { code, before, after, diff: after - before };
+        })
+      : [];
+
+  return (
+    <div className="mt-4">
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/35">
+        Try it
+      </p>
+      <div className="grid grid-cols-3 gap-1.5">
+        {INTERVENTIONS.map((iv) => {
+          const ready = iv.ready(inputs);
+          return (
+            <button
+              key={iv.id}
+              type="button"
+              disabled={!ready}
+              title={ready ? `${iv.label}: ${iv.hint}` : `${iv.label}: needs its base value first`}
+              onClick={() => setInputs(iv.apply({ ...inputs }))}
+              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-left transition-colors hover:bg-white/10 disabled:opacity-35 disabled:hover:bg-white/5"
+            >
+              <span className="block text-[11px] font-semibold leading-tight text-white">
+                {iv.label}
+              </span>
+              <span className="tnum block text-[10px] text-white/45">{iv.hint}</span>
+            </button>
+          );
+        })}
+      </div>
+      {!pin ? (
+        <button
+          type="button"
+          disabled={!prediction}
+          onClick={() => {
+            if (prediction) setPin({ inputs: { ...inputs }, prediction });
+          }}
+          className="mt-1.5 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:bg-white/10 disabled:opacity-40"
+        >
+          Pin baseline to compare
+        </button>
+      ) : (
+        <div className="mt-1.5 rounded-lg border border-white/10 bg-black/40 p-2.5">
+          <div className="tnum space-y-1 text-[11px]">
+            {deltas.map((d) => (
+              <div key={d.code} className="flex items-center justify-between gap-2">
+                <span className="font-semibold text-white/70">{d.code}</span>
+                <span className="text-white/50">
+                  {Math.round(d.before * 100)}→{Math.round(d.after * 100)}%
+                </span>
+                <span
+                  className={
+                    d.diff < -0.005
+                      ? "font-bold text-teal-300"
+                      : d.diff > 0.005
+                        ? "font-bold text-red-300"
+                        : "text-white/40"
+                  }
+                >
+                  {d.diff < -0.005 || d.diff > 0.005
+                    ? `${d.diff > 0 ? "+" : ""}${Math.round(d.diff * 100)}`
+                    : "—"}
+                </span>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setPin(null)}
+            className="mt-2 w-full rounded-md border border-white/10 px-2 py-1 text-[11px] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            Clear baseline
+          </button>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => {
+          snapshotRequest.pending = true;
+        }}
+        className="mt-1.5 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:bg-white/10"
+      >
+        Save heart PNG
+      </button>
+    </div>
+  );
+}
+
 export function TheatreSidebar() {
   const { inputs, setInputs, setError, selected } = useStore();
   // Mounted while theatre is open: edits re-score automatically (~400ms).
@@ -371,6 +512,7 @@ export function TheatreSidebar() {
         ) : (
           <>
             <LiveNumbers />
+            <TryIt />
             {(() => {
               const q = query.trim().toLowerCase();
               // Searching scans every dataset field (not just entered ones),

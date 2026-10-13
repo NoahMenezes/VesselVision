@@ -12,7 +12,7 @@
  *  Motion collapses to stillness under prefers-reduced-motion.
  */
 import { useEffect, useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { ARTERY_PATHS } from "@/lib/arteries";
 import { useStore } from "@/store/VesselVisionContext";
@@ -75,6 +75,29 @@ export function flowParams(inputs: Record<string, number | string>): FlowParams 
  *  temporary surge, then it decays. Module-local on purpose — one canvas
  *  at a time ever reads it. */
 const editPulse = { v: 0 };
+
+/** Snapshot bridge: the rail button arms this, SnapshotTaker (inside the
+ *  Canvas) captures the next frame and downloads it. Needs
+ *  preserveDrawingBuffer on the Canvas, set in HeartScene. */
+export const snapshotRequest = { pending: false };
+
+export function SnapshotTaker() {
+  const gl = useThree((s) => s.gl);
+  useFrame(() => {
+    if (!snapshotRequest.pending) return;
+    snapshotRequest.pending = false;
+    try {
+      const url = gl.domElement.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "vesselvision-heart.png";
+      a.click();
+    } catch {
+      /* canvas tainted or unavailable: silent no-op */
+    }
+  });
+  return null;
+}
 
 export function Heartbeat({ children }: { children: React.ReactNode }) {
   const ref = useRef<THREE.Group>(null);
