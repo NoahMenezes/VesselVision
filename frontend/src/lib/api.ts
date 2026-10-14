@@ -1,7 +1,7 @@
 /** Axios client for the FastAPI backend. Base URL from env; every call
  *  fails soft (caller decides offline UI) instead of throwing raw errors.
  */
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import type {
   BatchRowResult,
   ExplainResponse,
@@ -12,12 +12,53 @@ import type {
   UncertaintyResponse,
 } from "./types";
 
-/** Same-origin "/api" by default: in production Vercel routes it to the
- *  backend service; in local dev next.config rewrites it to :8000.
- *  NEXT_PUBLIC_API_URL still overrides (direct backend, e.g. Render). */
+/** Backend origin. NEXT_PUBLIC_API_URL wins when set (direct backend,
+ *  e.g. Render). Otherwise same-origin "/api": in local dev next.config
+ *  rewrites it to :8000; in production it needs a matching backend route
+ *  or reverse proxy, otherwise every call misses. */
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
-export const api = axios.create({ baseURL, timeout: 10000 });
+/** True when calls go same-origin (no explicit backend configured). */
+export const isSameOriginApi =
+  typeof window !== "undefined" &&
+  window.location.hostname !== "localhost" &&
+  window.location.hostname !== "127.0.0.1" &&
+  baseURL.startsWith("/");
+
+export const api = axios.create({ baseURL, timeout: 30000 });
+
+interface RetryableConfig {
+  __retries?: number;
+}
+
+/** Cold-start tolerance: free-tier backends sleep and need ~60s to wake,
+ *  far past one timeout. Retry timeouts, network errors and 502/503/504 —
+ *  but never non-idempotent writes (POST /history saves exactly once). */
+const MAX_RETRIES = 2;
+
+api.interceptors.response.use(undefined, async (error: unknown) => {
+  const err = error as {
+    code?: string;
+    response?: { status?: number };
+    config?: AxiosRequestConfig & RetryableConfig;
+  };
+  const cfg = err.config;
+  const method = cfg?.method?.toLowerCase() ?? "";
+  const url = cfg?.url ?? "";
+  const unsafeWrite = method === "post" && url.includes("/history");
+  const retryable =
+    !unsafeWrite &&
+    (err.code === "ECONNABORTED" ||
+      err.code === "ERR_NETWORK" ||
+      (err.response?.status !== undefined && [502, 503, 504].includes(err.response.status)));
+  const attempts = (cfg?.__retries ?? 0) + 1;
+  if (retryable && cfg && attempts <= MAX_RETRIES) {
+    cfg.__retries = attempts;
+    await new Promise((r) => setTimeout(r, attempts * 5000));
+    return api.request(cfg);
+  }
+  throw error;
+});
 
 export async function getHealth(): Promise<boolean> {
   try {

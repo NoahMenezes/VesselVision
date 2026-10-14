@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import { HeartPulse } from "lucide-react";
 import { clsx } from "clsx";
-import { getHealth, getSamples } from "@/lib/api";
+import { getHealth, getSamples, isSameOriginApi } from "@/lib/api";
 import { useStore } from "@/store/VesselVisionContext";
 import { PredictionDriver, usePrediction } from "@/hooks/usePrediction";
 import { Button } from "./ui";
@@ -100,7 +100,9 @@ export function Dashboard() {
         </div>
         {backend === "offline" && (
           <div role="alert" className="border-b border-risk-high/20 bg-risk-high/[0.06] px-4 py-2 text-center text-xs">
-            Not connected. The layout below is a preview — predictions need a connection.
+            {isSameOriginApi
+              ? "This deployment isn't pointed at its prediction API. Set NEXT_PUBLIC_API_URL to the backend origin and redeploy without build cache."
+              : "Not connected. The layout below is a preview — predictions need a connection."}
           </div>
         )}
         {/* Mobile section switch (Risk unlocks after prediction) */}
