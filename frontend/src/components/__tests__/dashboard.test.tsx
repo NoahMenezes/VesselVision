@@ -41,7 +41,7 @@ describe("mobile section switch", () => {
     expect(tabs.queryByRole("button", { name: "Data" })).toBeNull();
     expect(tabs.queryByRole("button", { name: "Heart" })).toBeNull();
     expect(tabs.getByRole("button", { name: "Report" })).toBeDefined();
-    expect((tabs.getByRole("button", { name: "Risk" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(tabs.getByRole("button", { name: "Risk" }).getAttribute("aria-disabled")).toBe("true");
     const scores = tabs.getByRole("button", { name: "Scores" });
     fireEvent.click(scores);
     expect(scores.getAttribute("aria-pressed")).toBe("true");

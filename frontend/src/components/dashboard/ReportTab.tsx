@@ -93,7 +93,8 @@ export function ReportTab() {
           </select>
           <Button
             variant="ghost"
-            disabled={saving}
+            aria-disabled={saving}
+            className={saving ? "cursor-wait opacity-70" : undefined}
             onClick={() => {
               if (saving) return;
               setSaving(true);

@@ -311,10 +311,12 @@ function TryIt() {
             <button
               key={iv.id}
               type="button"
-              disabled={!ready}
+              aria-disabled={!ready}
               title={ready ? `${iv.label}: ${iv.hint}` : `${iv.label}: needs its base value first`}
-              onClick={() => setInputs(iv.apply({ ...inputs }))}
-              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-left transition-colors hover:bg-white/10 disabled:opacity-35 disabled:hover:bg-white/5"
+              onClick={() => {
+                if (ready) setInputs(iv.apply({ ...inputs }));
+              }}
+              className={`rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-left transition-colors hover:bg-white/10 ${!ready ? "cursor-not-allowed opacity-35 hover:bg-white/5" : ""}`}
             >
               <span className="block text-[11px] font-semibold leading-tight text-white">
                 {iv.label}
@@ -327,11 +329,11 @@ function TryIt() {
       {!pin ? (
         <button
           type="button"
-          disabled={!prediction}
+          aria-disabled={!prediction}
           onClick={() => {
             if (prediction) setBaseline({ inputs: { ...inputs }, prediction, at: Date.now() });
           }}
-          className="mt-1.5 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:bg-white/10 disabled:opacity-40"
+          className={`mt-1.5 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:bg-white/10 ${!prediction ? "cursor-not-allowed opacity-40" : ""}`}
         >
           Pin baseline to compare
         </button>
@@ -494,16 +496,16 @@ export function TheatreSidebar() {
               <button
                 type="button"
                 onClick={() => loadSample("high")}
-                disabled={!samples || samples.length === 0}
-                className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-black disabled:opacity-40 hover:opacity-90"
+                aria-disabled={!samples || samples.length === 0}
+                className={`rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-black hover:opacity-90 ${!samples || samples.length === 0 ? "cursor-not-allowed opacity-40" : ""}`}
               >
                 Load high-risk example
               </button>
               <button
                 type="button"
                 onClick={() => loadSample("low")}
-                disabled={!samples || samples.length === 0}
-                className="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 disabled:opacity-40 hover:bg-white/10"
+                aria-disabled={!samples || samples.length === 0}
+                className={`rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 hover:bg-white/10 ${!samples || samples.length === 0 ? "cursor-not-allowed opacity-40" : ""}`}
               >
                 Load low-risk example
               </button>

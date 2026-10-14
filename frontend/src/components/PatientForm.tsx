@@ -8,6 +8,7 @@
  *  wrapped mid-word and overlapped. One column never collides at any width.
  */
 import { useEffect, useState } from "react";
+import { clsx } from "clsx";
 import { getSamples, getSchema } from "@/lib/api";
 import { GLOSSARY } from "@/lib/glossary";
 import type { FeatureSchema, SamplePatient, SchemaField } from "@/lib/types";
@@ -318,9 +319,11 @@ export function PatientForm() {
 
       <div className="mt-4 flex gap-2">
         <Button
-          className="flex-1"
-          onClick={() => void predictNow(inputs)}
-          disabled={loading || filled === 0}
+          className={clsx("flex-1", (loading || filled === 0) && "cursor-not-allowed opacity-50")}
+          onClick={() => {
+            if (!loading && filled > 0) void predictNow(inputs);
+          }}
+          aria-disabled={loading || filled === 0}
         >
           {loading ? "Predicting…" : "Predict"}
         </Button>

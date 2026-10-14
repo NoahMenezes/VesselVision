@@ -89,6 +89,9 @@ export function CsvUpload() {
     setError(null);
   };
 
+  const predictOff = loading || loaded === null || Object.keys(inputs).length === 0;
+  const scoreOff = scoring || !upload;
+
   const loadRow = (row: Record<string, string>, index: number) => {
     const next: Record<string, number | string> = {};
     for (const [k, v] of Object.entries(row)) {
@@ -215,16 +218,22 @@ export function CsvUpload() {
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Button
                   size="sm"
-                  onClick={() => void predictNow(inputs)}
-                  disabled={loading || loaded === null || Object.keys(inputs).length === 0}
+                  onClick={() => {
+                    if (!predictOff) void predictNow(inputs);
+                  }}
+                  aria-disabled={predictOff}
+                  className={predictOff ? "cursor-not-allowed opacity-50" : undefined}
                 >
                   {loading ? "Scoring…" : loaded === null ? "Predict" : `Predict row ${loaded + 1}`}
                 </Button>
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => void scoreAll()}
-                  disabled={scoring || !upload}
+                  onClick={() => {
+                    if (!scoreOff) void scoreAll();
+                  }}
+                  aria-disabled={scoreOff}
+                  className={scoreOff ? "cursor-not-allowed opacity-50" : undefined}
                 >
                   {scoring ? "Scoring…" : "Score all"}
                 </Button>

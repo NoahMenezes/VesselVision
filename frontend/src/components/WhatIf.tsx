@@ -85,7 +85,13 @@ export function WhatIf() {
             />
           </label>
           <div className="mt-2">
-            <Button onClick={() => void run()} disabled={busy}>
+            <Button
+              onClick={() => {
+                if (!busy) void run();
+              }}
+              aria-disabled={busy}
+              className={busy ? "cursor-wait opacity-70" : undefined}
+            >
               {busy ? "Scoring…" : "Preview effect"}
             </Button>
           </div>

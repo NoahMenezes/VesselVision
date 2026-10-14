@@ -112,9 +112,10 @@ export function Dashboard() {
                 <button
                   key={t.id}
                   type="button"
-                  disabled={gated}
+                  aria-disabled={gated}
                   title={gated ? "Unlocks after your first prediction" : undefined}
                   onClick={() => {
+                    if (gated) return;
                     // Tapping the active tab returns to the overview grid.
                     // Report has no tab slot of its own; the view tracks it.
                     if ((tab === t.id || view === t.id) && view !== "overview") {
@@ -128,7 +129,7 @@ export function Dashboard() {
                   className={clsx(
                     "rounded-md px-1 py-2 text-[13px] font-semibold transition-colors duration-200",
                     tab === t.id ? "bg-surface text-foreground shadow-sm" : "text-muted",
-                    gated && "opacity-40",
+                    gated && "cursor-not-allowed opacity-40",
                   )}
                 >
                   {t.label}
@@ -176,7 +177,13 @@ function DemoButton() {
   };
   return (
     <div className="text-center">
-      <Button onClick={() => void run()} disabled={busy}>
+      <Button
+        onClick={() => {
+          if (!busy) void run();
+        }}
+        aria-disabled={busy}
+        className={busy ? "cursor-wait opacity-70" : undefined}
+      >
         {busy ? "Running demo…" : "Run demo patient →"}
       </Button>
       <p className="mt-1.5 text-xs text-muted">
