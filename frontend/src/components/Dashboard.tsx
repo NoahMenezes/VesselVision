@@ -3,12 +3,13 @@
  *  The rail (desktop) and tabs (mobile) switch pages; every page holds one
  *  part of the solution, nothing is clustered.
  */
-import { useEffect } from "react";
-import { clsx } from "clsx";
-import { getHealth } from "@/lib/api";
-import { useStore } from "@/store/VesselVisionContext";
+import { useEffect, useState } from "react";
 import { HeartPulse } from "lucide-react";
-import { PredictionDriver } from "@/hooks/usePrediction";
+import { clsx } from "clsx";
+import { getHealth, getSamples } from "@/lib/api";
+import { useStore } from "@/store/VesselVisionContext";
+import { PredictionDriver, usePrediction } from "@/hooks/usePrediction";
+import { Button } from "./ui";
 import { HistoryTab } from "./dashboard/HistoryTab";
 import { PerformanceTab } from "./dashboard/PerformanceTab";
 import { ReportTab } from "./dashboard/ReportTab";
@@ -151,10 +152,48 @@ export function Dashboard() {
 
 /** Start layout: step strip on top, patient data centered. The heart and
  *  results return (three-column grid) once the first prediction lands. */
+/** One click for judges: loads the high-risk example, scores it, and drops
+ *  you at the recolored heart. */
+function DemoButton() {
+  const { setInputs, setError, error } = useStore();
+  const { predictNow } = usePrediction();
+  const [busy, setBusy] = useState(false);
+  const run = async () => {
+    setBusy(true);
+    const samples = await getSamples();
+    const s = samples.find((x) => x.description.includes("high-risk")) ?? samples[0];
+    if (!s) {
+      setBusy(false);
+      return;
+    }
+    setInputs({ ...s.inputs });
+    setError(null);
+    await predictNow({ ...s.inputs });
+    setBusy(false);
+    requestAnimationFrame(() => {
+      document.getElementById("explore-heart")?.scrollIntoView({ behavior: "smooth" });
+    });
+  };
+  return (
+    <div className="text-center">
+      <Button onClick={() => void run()} disabled={busy}>
+        {busy ? "Running demo…" : "Run demo patient →"}
+      </Button>
+      <p className="mt-1.5 text-xs text-muted">
+        Loads a high-risk case and scores it instantly.
+      </p>
+      {error ? <p className="mt-1 text-xs text-risk-moderate">{error}</p> : null}
+    </div>
+  );
+}
+
+/** Start layout: step strip on top, patient data centered. The heart and
+ *  results return (three-column grid) once the first prediction lands. */
 function StartPage() {
   return (
     <main id="main" className="mx-auto w-full max-w-2xl flex-1 space-y-4 p-3 lg:px-6">
       <StepStrip />
+      <DemoButton />
       <div id="enter-data" className="scroll-mt-4">
         <InputPanel />
       </div>

@@ -14,6 +14,13 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = BACKEND_DIR.parent
 
 
+def _resolve_against_backend(raw: str) -> Path:
+    """Relative dirs in .env resolve against backend/, never the caller's
+    cwd (the dev servers start from frontend/). Absolute paths pass through."""
+    p = Path(raw)
+    return p if p.is_absolute() else BACKEND_DIR / p
+
+
 def _load_dotenv() -> None:
     """Load backend/.env into the environment (no extra dependency).
     Shell-exported variables always win; this only fills the gaps so
@@ -32,8 +39,8 @@ def _load_dotenv() -> None:
 
 
 _load_dotenv()
-DATA_DIR = Path(os.getenv("DATA_DIR", REPO_ROOT / "data"))
-ARTIFACTS_DIR = Path(os.getenv("ARTIFACTS_DIR", BACKEND_DIR / "artifacts"))
+DATA_DIR = _resolve_against_backend(os.getenv("DATA_DIR", "../data"))
+ARTIFACTS_DIR = _resolve_against_backend(os.getenv("ARTIFACTS_DIR", "./artifacts"))
 PROCESSED_DIR = DATA_DIR / "processed"
 
 # --- Targets (binary) ---
