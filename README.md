@@ -303,7 +303,9 @@ decision-support only.
 |---|---|
 | OpenCode (Muse Spark) | Scaffolding, training pipeline, API, frontend, 3D scene, docs drafts |
 | Taste skills (`Leonxlnx/taste-skill`) | Frontend design rules (dark console direction, anti-slop bans) |
-| ChatGPT / similar (if used) | TODO_CONFIRM — copy review, demo script polish |
+| ChatGPT | Copy review, demo script polish |
+
+Built With (matches Devpost tags): `fastapi, scikit-learn, xgboost, lightgbm, shap, nextjs, react-three-fiber, recharts, tailwind, postgresql, opencode, chatgpt`
 
 All metrics are real outputs of the training code; no results fabricated. The team reviewed,
 tested and can explain all committed code. TODO: confirm this table with all members.
