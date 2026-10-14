@@ -1,0 +1,16 @@
+# Keep the serverless bundle lean. Backend reads data/processed,
+# data/feature_schema.json and backend/artifacts at runtime — everything
+# else below is training, docs, or dead weight and stays out of deploys.
+public/*.glb
+data/raw
+notebooks
+docs
+backend/tests
+frontend/src/components/__tests__
+**/__pycache__
+**/*.pyc
+.venv
+venv
+node_modules
+.next
+.git
