@@ -288,7 +288,7 @@ First-run notes: models (~6 MB joblib) load at API startup; without them, model 
 3. Click an artery (3D, chip, legend, mini-map or 2D buttons) to focus it.
 4. Read **Why this prediction** (SHAP bars) and the measurements table.
 5. Drag a what-if slider (or theatre lever / Statin preset) and watch the heart respond.
-6. Upload `frontend/public/sample-patients.csv`, **Score all**, click a row, open **Report** (pick Hindi/Spanish/…), **Save checkup**, revisit it under **History**.
+6. Upload `frontend/public/patients.csv`, **Score all**, click a row, open **Report** (pick Hindi/Spanish/…), **Save checkup**, revisit it under **History**.
 
 ## Limitations and honest notes
 

@@ -112,8 +112,8 @@ export function CsvUpload() {
         <p className="text-xs text-muted">Drop a file, pick a row to load it.</p>
         <span className="flex shrink-0 gap-1.5">
           <a
-            href="/sample-patients.csv"
-            download="sample-patients.csv"
+            href="/patients.csv"
+            download="patients.csv"
             className="rounded px-2.5 py-1 text-xs font-semibold border border-border bg-surface text-foreground hover:bg-surface-soft"
           >
             Sample file
