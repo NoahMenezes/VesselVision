@@ -3,11 +3,9 @@
  *  Reads GET /metrics; honest pending state until final evaluation lands.
  */
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { ANATOMY_MAP } from "@/lib/arteries";
 import { Button, Card } from "../ui";
-
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 interface TargetScore {
   accuracy: number;
@@ -29,7 +27,7 @@ function pct(x: number) {
 export function PerformanceTab() {
   const [metrics, setMetrics] = useState<Record<string, TargetScore> | null>(null);
   useEffect(() => {
-    axios.get(`${BASE}/metrics`).then((r) => setMetrics(r.data)).catch(() => setMetrics(null));
+    api.get("/metrics").then((r) => setMetrics(r.data)).catch(() => setMetrics(null));
   }, []);
   return (
     <div className="space-y-3">

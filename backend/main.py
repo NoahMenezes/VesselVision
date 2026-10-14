@@ -46,6 +46,7 @@ async def add_process_time(request: Request, call_next):
 
 
 @app.get("/", include_in_schema=False)
+@app.get("/api", include_in_schema=False)
 def root() -> dict[str, object]:
     """Service landing (browsers hit / by default): status + where to go."""
     from app.predict import _state
@@ -62,8 +63,12 @@ def root() -> dict[str, object]:
 
 
 @app.get("/health", response_model=HealthResponse)
+@app.get("/api/health", response_model=HealthResponse, include_in_schema=False)
 def health() -> HealthResponse:
     return HealthResponse()
 
 
+# Served twice on purpose: bare paths for local dev (curl :8000/predict),
+# /api-prefixed for Vercel services mode (rewrite preserves the prefix).
 app.include_router(router)
+app.include_router(router, prefix="/api")

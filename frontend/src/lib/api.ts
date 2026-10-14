@@ -12,7 +12,10 @@ import type {
   UncertaintyResponse,
 } from "./types";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+/** Same-origin "/api" by default: in production Vercel routes it to the
+ *  backend service; in local dev next.config rewrites it to :8000.
+ *  NEXT_PUBLIC_API_URL still overrides (direct backend, e.g. Render). */
+const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 export const api = axios.create({ baseURL, timeout: 10000 });
 
